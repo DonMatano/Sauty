@@ -3,4 +3,6 @@
     <string name="post_tab_title">Posts</string>
     <string name="discovery_tab_title">Discovery</string>
     <string name="profile_tab_title">Profile</string>
+    <string name="google_sign_in_failed">Sign In failed. Please Try to sign in again.</string>
+    <string name="google_sign_in_succeed">Google Sign In Successfully</string>
 </resources>

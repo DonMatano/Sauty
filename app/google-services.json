@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "124775510452",
+    "firebase_url": "https://sauty-d58aa.firebaseio.com",
+    "project_id": "sauty-d58aa",
+    "storage_bucket": "sauty-d58aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124775510452:android:1b8659598a51587a",
+        "android_client_info": {
+          "package_name": "com.matano.sauty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "124775510452-vqrs7ojng3pg0ebhu123f6ecn1gmuojm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.matano.sauty",
+            "certificate_hash": "e6c2d0b67f655122cb185cde00e832564b091556"
+          }
+        },
+        {
+          "client_id": "124775510452-ttakvlvqkl5nsa7asrndmhieo3klp46t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWeHj5j5F-0BHBctoRurMvtD_ZZVsxHVY"
+        },
+        {
+          "current_key": "AIzaSyDnypWQvovuOhrdWA1Gq6oUwazwMq0iVJc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "124775510452-ttakvlvqkl5nsa7asrndmhieo3klp46t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
