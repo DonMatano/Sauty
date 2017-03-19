@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.matano.sauty.Model.SautyUser;
 
 /**
@@ -60,7 +62,11 @@ public class ProfileFragment extends Fragment
 
     private void initiateLayout()
     {
-        userProfile.setImageURI(user.getUserProfilePic());
+        Glide.with(getContext()).load(user.getUserProfilePic())
+                .thumbnail(0.5f)
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(userProfile);
         userName.setText(user.getUserName());
         followersCount.setText(String.valueOf(user.getUserFollowersCount()));
         followingCount.setText(String.valueOf(user.getUserFollowingCount()));
