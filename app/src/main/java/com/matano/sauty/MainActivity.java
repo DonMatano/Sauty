@@ -1,6 +1,7 @@
 package com.matano.sauty;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.matano.sauty.Model.SautyUser;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener
@@ -41,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         firebaseAuth = FirebaseAuth.getInstance();
 
         initializeAuthStateListener();
-
 
 
     }
@@ -94,11 +95,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null )
                 {
-                    if (!alreadySignIn)
-                    {
-                        alreadySignIn = true;
-                        initializeTabLayout();
-                    }
+                    initializeSautyUser(user);
+
+
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
@@ -109,6 +108,38 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 // ...
             }
         };
+    }
+
+    private void initializeSautyUser(FirebaseUser firebaseUser)
+    {
+        if (firebaseUser != null)
+        {
+            if (!alreadySignIn)
+            {
+                for (UserInfo profile : firebaseUser.getProviderData())
+                {
+                    if (!alreadySignIn)
+                    {
+                        // Id of the provider (ex: google.com)
+                        String providerId = profile.getProviderId();
+
+                        // UID specific to the provider
+                        String uid = profile.getUid();
+
+                        // Name, email address, and profile photo Url
+                        String name = profile.getDisplayName();
+                        String email = profile.getEmail();
+                        Uri photoUrl = profile.getPhotoUrl();
+
+                        user = new SautyUser(name, photoUrl, email, firebaseUser.getUid());
+
+                        alreadySignIn = true;
+
+                        initializeTabLayout();
+                    }
+                }
+            }
+        }
     }
 
     public void initializeTabLayout()
@@ -134,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         viewPager = (ViewPager) findViewById(R.id.pager);
 
         Pager tabPagerAdapter = new Pager(getSupportFragmentManager(),
-                tabLayout.getTabCount(), this);
+                tabLayout.getTabCount(), this, user);
 
         //Adding adapter to pager
         viewPager.setAdapter(tabPagerAdapter);
@@ -184,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void signOut()
     {
-       firebaseAuth.getInstance().signOut();
+       firebaseAuth.signOut();
     }
 
     private void showSignInActivity()

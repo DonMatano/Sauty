@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.matano.sauty.DiscoveryFragment;
+import com.matano.sauty.Model.SautyUser;
 import com.matano.sauty.PostFragment;
 import com.matano.sauty.ProfileFragment;
 
@@ -18,14 +19,16 @@ public class Pager extends FragmentPagerAdapter
     //integer to count number of tabs
     int tabCount;
     Context context;
+    SautyUser sautyUser;
 
     //constructor
 
-    public Pager(FragmentManager fm, int tabCount, Context context)
+    public Pager(FragmentManager fm, int tabCount, Context context, SautyUser sautyUser)
     {
         super(fm);
         this.tabCount = tabCount;
         this.context = context;
+        this.sautyUser = sautyUser;
     }
 
     @Override
@@ -35,13 +38,13 @@ public class Pager extends FragmentPagerAdapter
         switch (position)
         {
             case 0:
-                return PostFragment.newInstance();
+                return PostFragment.newInstance(sautyUser);
 
             case 1:
-                return DiscoveryFragment.newInstance();
+                return DiscoveryFragment.newInstance(sautyUser);
 
             case 2:
-                return ProfileFragment.newInstance();
+                return ProfileFragment.newInstance(sautyUser);
 
             default:
                 return null;
