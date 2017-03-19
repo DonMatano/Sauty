@@ -1,7 +1,6 @@
 package com.matano.sauty;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -9,6 +8,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.matano.sauty.Model.SautyUser;
-import com.matano.sauty.View.Pager;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener
 {
@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         initializeAuthStateListener();
 
-        initializeTabLayout();
 
 
     }
@@ -85,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     {
         Log.d(TAG, "onDestroy of MainActivity");
         super.onDestroy();
-
-        firebaseAuth.signOut();
     }
 
     private void initializeAuthStateListener()
@@ -95,7 +92,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
+                if (user != null )
+                {
+                    if (!alreadySignIn)
+                    {
+                        alreadySignIn = true;
+                        initializeTabLayout();
+                    }
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
@@ -161,7 +164,27 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        return super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.signOutMenuItem:
+            {
+                signOut();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void signOut()
+    {
+       firebaseAuth.getInstance().signOut();
     }
 
     private void showSignInActivity()

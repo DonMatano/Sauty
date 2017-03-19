@@ -5,4 +5,11 @@
     <string name="profile_tab_title">Profile</string>
     <string name="google_sign_in_failed">Sign In failed. Please Try to sign in again.</string>
     <string name="google_sign_in_succeed">Google Sign In Successfully</string>
+    <string name="no_status_hint">No Status Set</string>
+    <string name="followers_text">followers</string>
+    <string name="following_text">following</string>
+    <string name="user_profile_image">This is your user profile image</string>
+    <string name="followers_button_text">Followers button. Click to know your followers</string>
+    <string name="following_button_text">Click to know who you are following</string>
+    <string name="sign_out_text">Sign Out</string>
 </resources>

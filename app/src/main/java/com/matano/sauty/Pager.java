@@ -1,4 +1,4 @@
-package com.matano.sauty.View;
+package com.matano.sauty;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
