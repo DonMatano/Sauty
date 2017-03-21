@@ -38,18 +38,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         googleSignInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
         googleSignInButton.setOnClickListener(this);
 
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
 
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-// options specified by gso.
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this/* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
     }
 
     @Override
@@ -125,8 +114,8 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 setResult(RESULT_OK , new Intent().putExtra("account", account.getIdToken()));
-                finish();
                 Toast.makeText(this, R.string.google_sign_in_succeed, Toast.LENGTH_SHORT).show();
+                finish();
             }
             else
             {

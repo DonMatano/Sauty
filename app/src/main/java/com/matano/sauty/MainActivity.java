@@ -13,6 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.*;
+import com.firebase.ui.auth.BuildConfig;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -23,16 +25,20 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
 import com.matano.sauty.Model.SautyUser;
 
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener
 {
     TabLayout tabLayout;
     ViewPager viewPager;
     final int SIGN_IN = 11;
+    final int FIRE_UI_SIGN_IN = 55;
     final static String TAG = MainActivity.class.getSimpleName();
     SautyUser user;
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseAuth firebaseAuth;
     private boolean alreadySignIn = false;
+    private boolean alreadyInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,7 +48,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        initializeAuthStateListener();
+        if (firebaseAuth.getCurrentUser() != null)
+        {
+            //Already signed in
+            initializeSautyUser(firebaseAuth.getCurrentUser());
+        }
+        else
+        {
+            showSignInActivity();
+        }
+
+
+
+        //initializeAuthStateListener();
 
 
     }
@@ -52,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     {
         Log.d(TAG, "onStart of MainActivity");
         super.onStart();
-        firebaseAuth.addAuthStateListener(authStateListener);
+        //firebaseAuth.addAuthStateListener(authStateListener);
     }
 
     @Override
@@ -74,16 +92,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     {
         Log.d(TAG, "onStop of MainActivity");
         super.onStop();
-        if (authStateListener != null)
-        {
-            firebaseAuth.removeAuthStateListener(authStateListener);
-        }
+
     }
 
     @Override
     protected void onDestroy()
     {
         Log.d(TAG, "onDestroy of MainActivity");
+//        if (authStateListener != null)
+//        {
+//            firebaseAuth.removeAuthStateListener(authStateListener);
+//        }
         super.onDestroy();
     }
 
@@ -92,15 +111,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null )
-                {
-                    initializeSautyUser(user);
 
+                if (firebaseAuth.getCurrentUser() != null )
+                {
+                        initializeSautyUser(firebaseAuth.getCurrentUser());
 
                     // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
+                }
+                else
+                {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                     showSignInActivity();
@@ -121,10 +140,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     if (!alreadySignIn)
                     {
                         // Id of the provider (ex: google.com)
-                        String providerId = profile.getProviderId();
+                        //String providerId = profile.getProviderId();
 
                         // UID specific to the provider
-                        String uid = profile.getUid();
+                        //String uid = profile.getUid();
 
                         // Name, email address, and profile photo Url
                         String name = profile.getDisplayName();
@@ -135,7 +154,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
                         alreadySignIn = true;
 
-                        initializeTabLayout();
+                        if(!alreadyInitialized)
+                        {
+                            initializeTabLayout();
+                        }
                     }
                 }
             }
@@ -172,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         viewPager.addOnPageChangeListener(
                 new TabLayout.TabLayoutOnPageChangeListener(tabLayout)
         );
+
+        alreadyInitialized = true;
     }
 
     @Override
@@ -215,13 +239,31 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private void signOut()
     {
-       firebaseAuth.signOut();
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        //user is now signed out
+                        showSignInActivity();
+                    }
+                });
+
     }
 
     private void showSignInActivity()
     {
-        Intent signInActivity = new Intent(this, SignInActivity.class);
-        startActivityForResult(signInActivity, SIGN_IN);
+        //Intent signInActivity = new Intent(this, SignInActivity.class);
+        //startActivityForResult(signInActivity, SIGN_IN);
+        startActivityForResult(
+                AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setIsSmartLockEnabled(!BuildConfig.DEBUG)
+                .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                .build(), FIRE_UI_SIGN_IN
+        );
     }
 
     private void firebaseAuthWithGoogle(String signInAccount)
@@ -269,5 +311,72 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 showSignInActivity();
             }
         }
+
+        //FIRE_UI_SIGN is the request code you passed
+        if (requestCode == FIRE_UI_SIGN_IN)
+        {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+
+            //successfully signed in
+            if (resultCode == ResultCodes.OK)
+            {
+                initializeSautyUser(firebaseAuth.getCurrentUser());
+                return;
+            }
+            else
+            {
+                //sign in failed
+                if (response == null)
+                {
+                    //User pressed back button
+                    Toast.makeText(this, "sign_in_cancelled", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (response.getErrorCode() == ErrorCodes.NO_NETWORK)
+                {
+                    Toast.makeText(this, "No internet Connection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR)
+                {
+                    Toast.makeText(this, "Unknown Error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            Toast.makeText(this, "Unknown Sign In response", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
