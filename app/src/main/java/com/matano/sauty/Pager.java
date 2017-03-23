@@ -5,10 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.matano.sauty.DiscoveryFragment;
 import com.matano.sauty.Model.SautyUser;
-import com.matano.sauty.PostFragment;
-import com.matano.sauty.ProfileFragment;
 
 /**
  * Created by matano on 17/3/17.
@@ -38,7 +35,7 @@ public class Pager extends FragmentPagerAdapter
         switch (position)
         {
             case 0:
-                return PostFragment.newInstance(sautyUser);
+                return FeedFragment.newInstance(sautyUser);
 
             case 1:
                 return DiscoveryFragment.newInstance(sautyUser);

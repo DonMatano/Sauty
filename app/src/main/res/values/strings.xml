@@ -13,4 +13,33 @@
     <string name="following_button_text">Click to know who you are following</string>
     <string name="sign_out_text">Sign Out</string>
     <string name="user_default_status">Hey there</string>
+    <string name="user_name_description">Your user nama</string>
+    <string name="image_post_describtion">image_description</string>
+    <string name="lorae_ipsum_text">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut commodo sapien ex, ut tristique orci vehicula eu. Etiam ultricies, quam et gravida ullamcorper, dui augue rhoncus mi, vel vestibulum risus tellus in magna. Aliquam lobortis nibh dolor, eu feugiat tortor elementum sit amet. Donec tempor felis non fermentum aliquet.
+        Etiam quis quam a massa efficitur convallis ut vel ipsum. Etiam placerat tortor sit amet finibus egestas. Praesent vel dolor dui. Etiam auctor enim neque, et ultricies leo sagittis ac. Sed in dui in neque convallis volutpat. Curabitur urna ex, consequat non sagittis nec, finibus et magna. Duis mi elit, dignissim sed lectus rutrum, porttitor convallis ligula. Maecenas ex eros, ullamcorper eget dignissim vitae, sodales eu enim. Maecenas at felis rhoncus, dignissim eros sit amet, congue ante.
+        Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur ultrices luctus lectus, rhoncus feugiat ipsum pretium sed. Integer id leo at tortor condimentum fermentum.
+
+        Phasellus tempor orci ac mauris ultricies convallis. Curabitur commodo elit quis bibendum egestas. Morbi tortor enim, aliquet id eleifend nec, molestie at ante. In hac habitasse platea dictumst. Donec dolor justo, tincidunt quis mi ut, commodo vestibulum tortor.
+        Integer mollis egestas urna, ut rutrum libero condimentum id. Nam imperdiet iaculis tortor, eu mollis dolor pellentesque nec. Nam nibh est, cursus ac sollicitudin ut, vestibulum ut diam. Donec porta sapien sed ipsum congue maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non enim quis quam rutrum suscipit non eu urna.
+
+Praesent molestie tortor quis ligula vehicula, tempor accumsan massa fringilla. Nullam vestibulum vel arcu vitae sollicitudin. Nunc eget pellentesque eros. Vestibulum sit amet facilisis felis. Ut cursus egestas pretium. Mauris eu augue lectus. In eu urna et lectus mollis finibus ut a metus. Quisque aliquam facilisis ligula in dignissim.
+
+Praesent at tempus odio. Morbi sodales ligula ac dignissim condimentum. Nunc ut massa id massa cursus egestas id ut turpis. Fusce laoreet mi interdum, efficitur tellus eu, ultrices nibh. Praesent ornare vitae diam in pellentesque. Fusce vel tincidunt ex, pharetra ullamcorper enim. Proin quis scelerisque tellus. Pellentesque et malesuada mauris. Fusce vel placerat odio. Etiam sodales luctus nulla a lobortis. Curabitur libero leo, egestas nec urna eget, mattis aliquet ligula. Fusce egestas justo eu est laoreet, sed vulputate nibh lacinia. Cras in quam enim.
+
+Integer suscipit gravida leo eu ultricies. Nunc efficitur consectetur maximus. Nullam vel ante a purus rhoncus auctor id et enim. Etiam euismod ante velit. Cras mauris ipsum, vestibulum in placerat at, sodales a ex. Nulla aliquam dapibus lobortis. Praesent dapibus ac orci nec viverra. Vivamus mi lorem, lobortis sed suscipit id, egestas ac dui. Cras at mauris augue. Maecenas maximus id diam eu posuere. Duis sagittis viverra efficitur.
+    </string>
+    <string name="like_image">Like....</string>
+    <string name="share_description">Share....</string>
+    <string name="save_desc">Save.....</string>
+    <string name="new_Post">Adding New Post</string>
+    <string name="enter_new_post_description">Enter post description</string>
+    <string name="post_text">Add Post</string>
+    <string name="add_photo_desc">Please add your photo</string>
+    <string name="no_post_on_wall_text">
+        There is no posts to your wall.
+        Follow someone in the Discover Tab or add a post by pressing the add post button below.
+    </string>
+
+
 </resources>
