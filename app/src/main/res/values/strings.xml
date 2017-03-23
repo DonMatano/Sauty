@@ -12,4 +12,5 @@
     <string name="followers_button_text">Followers button. Click to know your followers</string>
     <string name="following_button_text">Click to know who you are following</string>
     <string name="sign_out_text">Sign Out</string>
+    <string name="user_default_status">Hey there</string>
 </resources>

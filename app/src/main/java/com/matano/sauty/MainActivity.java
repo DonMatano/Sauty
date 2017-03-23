@@ -23,11 +23,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.matano.sauty.Model.DatabaseHelper;
 import com.matano.sauty.Model.SautyUser;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener
+    , DatabaseHelper.userFinishedSettingListener
 {
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -35,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     final int FIRE_UI_SIGN_IN = 55;
     final static String TAG = MainActivity.class.getSimpleName();
     SautyUser user;
-    private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseAuth firebaseAuth;
-    private boolean alreadySignIn = false;
-    private boolean alreadyInitialized = false;
+//    private boolean alreadySignIn = false;
+//    private boolean alreadyInitialized = false;
+    DatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_main);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        databaseHelper = DatabaseHelper.getInstance();
 
         if (firebaseAuth.getCurrentUser() != null)
         {
@@ -106,61 +113,36 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onDestroy();
     }
 
-    private void initializeAuthStateListener()
-    {
-        authStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
-                if (firebaseAuth.getCurrentUser() != null )
-                {
-                        initializeSautyUser(firebaseAuth.getCurrentUser());
-
-                    // User is signed in
-                }
-                else
-                {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                    showSignInActivity();
-                }
-                // ...
-            }
-        };
-    }
-
-    private void initializeSautyUser(FirebaseUser firebaseUser)
+    private void initializeSautyUser(final FirebaseUser firebaseUser)
     {
         if (firebaseUser != null)
         {
-            if (!alreadySignIn)
+            DatabaseReference userRef = databaseHelper.getRootDatabaseRef().child("users");
+            userRef.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener()
             {
-                for (UserInfo profile : firebaseUser.getProviderData())
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot)
                 {
-                    if (!alreadySignIn)
+                    if (dataSnapshot.getValue() !=  null)
                     {
-                        // Id of the provider (ex: google.com)
-                        //String providerId = profile.getProviderId();
-
-                        // UID specific to the provider
-                        //String uid = profile.getUid();
-
-                        // Name, email address, and profile photo Url
-                        String name = profile.getDisplayName();
-                        String email = profile.getEmail();
-                        Uri photoUrl = profile.getPhotoUrl();
-
-                        user = new SautyUser(name, photoUrl, email, firebaseUser.getUid());
-
-                        alreadySignIn = true;
-
-                        if(!alreadyInitialized)
-                        {
-                            initializeTabLayout();
-                        }
+                        //userExists.
+                      databaseHelper.setSautyUser(firebaseUser, MainActivity.this);
                     }
+                    else
+                    {
+                        //user doesn't exist. Create new user in database
+                        databaseHelper.addNewUserInDatabase(firebaseUser, MainActivity.this);
+                    }
+
                 }
-            }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError)
+                {
+
+                }
+            });
         }
     }
 
@@ -195,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 new TabLayout.TabLayoutOnPageChangeListener(tabLayout)
         );
 
-        alreadyInitialized = true;
     }
 
     @Override
@@ -348,35 +329,21 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
             Toast.makeText(this, "Unknown Sign In response", Toast.LENGTH_SHORT).show();
         }
+    }
 
+    //DatabaseHelper Listener
+    
+    //userSetListeners
+    @Override
+    public void onSuccess(SautyUser user)
+    {
+        this.user = user;
+        initializeTabLayout();
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public void onFailed()
+    {
+        Toast.makeText(this, "ERROR!...Setting User failed....", Toast.LENGTH_SHORT).show();
     }
 }

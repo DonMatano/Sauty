@@ -1,6 +1,7 @@
 package com.matano.sauty;
 
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -62,7 +63,7 @@ public class ProfileFragment extends Fragment
 
     private void initiateLayout()
     {
-        Glide.with(getContext()).load(user.getUserProfilePic())
+        Glide.with(getContext()).load(Uri.parse(user.getUserProfilePic()))
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
