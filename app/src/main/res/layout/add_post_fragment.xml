@@ -20,8 +20,8 @@
         android:id="@+id/addPhotoImageView"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginTop="5dp"
         android:layout_weight="0.53"
-        android:background="@color/add_hoto_background"
         android:contentDescription="@string/add_photo_desc"
         app:srcCompat="@drawable/ic_add_a_photo_black_24dp"/>
 

@@ -15,7 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,7 +37,7 @@ public class FeedFragment extends Fragment
     ConstraintLayout fragmentConstraintLayout;
     FirebaseAuth firebaseAuth;
     DatabaseHelper databaseHelper;
-    FirebaseRecyclerAdapter<Post , PostHolder> recyclerAdapter;
+    FirebaseIndexRecyclerAdapter<Post , PostHolder> recyclerAdapter;
     FabButtonClickedListenter listenter;
 
     public static FeedFragment newInstance(SautyUser sautyUser)
@@ -100,12 +100,12 @@ public class FeedFragment extends Fragment
         });
         fragmentConstraintLayout = (ConstraintLayout) v.findViewById(R.id.feedsFragmentConstriantLayout);
 
-        isTherePosts(v);
+        isTherePosts();
 
         return v;
     }
 
-    private void isTherePosts(final View view)
+    private void isTherePosts()
     {
         if (firebaseAuth.getCurrentUser() != null)
         {
@@ -119,12 +119,12 @@ public class FeedFragment extends Fragment
                     if (dataSnapshot.getValue() != null)
                     {
                         //user Feed Available
-                        showFeed(view);
+                        showFeed();
                     }
                     else
                     {
                         //user Feed doesn't exist. Show no Feed TextView
-                        showNoFeed(view);
+                        showNoFeed();
                     }
 
                 }
@@ -138,12 +138,12 @@ public class FeedFragment extends Fragment
         }
     }
 
-    private void showFeed(View view)
+    private void showFeed()
     {
 
     }
 
-    private void showNoFeed(View view)
+    private void showNoFeed()
     {
         recycler.setVisibility(View.GONE);
 
@@ -154,7 +154,7 @@ public class FeedFragment extends Fragment
         fragmentConstraintLayout.addView(noPostTextView);
     }
 
-    public interface FabButtonClickedListenter
+    interface FabButtonClickedListenter
     {
         void onAddPostFabButtonClicked();
 
