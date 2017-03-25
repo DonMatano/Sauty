@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,11 +26,14 @@ import com.matano.sauty.Model.SautyUser;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements
-     DatabaseHelper.userFinishedSettingListener, FeedFragment.FabButtonClickedListenter
+     DatabaseHelper.userFinishedSettingListener, FeedFragment.FabButtonClickedListener
+    ,AddPostFragment.onPostAddedListener
 {
 
     final int FIRE_UI_SIGN_IN = 55;
     final static String TAG = MainActivity.class.getSimpleName();
+    final static String ADD_POST_FRAG = "Add Post Fragment";
+    final static String FEEDS_FRAG = "Feed Fragment";
     SautyUser user;
     private FirebaseAuth firebaseAuth;
     DatabaseHelper databaseHelper;
@@ -198,9 +200,18 @@ public class MainActivity extends AppCompatActivity implements
     public void onAddPostFabButtonClicked()
     {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.activity_frameLayout, new AddPostFragment());
+
+        transaction.replace(R.id.activity_frameLayout, AddPostFragment.newInstance(), ADD_POST_FRAG);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    //AddPostFragment Listener
+
+    @Override
+    public void postAddedSuccessfully()
+    {
+        getSupportFragmentManager().popBackStack();
     }
 
 

@@ -6,20 +6,18 @@ package com.matano.sauty.Model;
 
 public class ImagePost extends Post
 {
-    public ImagePost(String posterId, String imageUID, String timeStamp)
+    public ImagePost(String posterId, String imageUID)
     {
         super();
         setPosterId(posterId);
         setImageUID(imageUID);
-        setTimeStamp(timeStamp);
     }
 
-    public ImagePost(String posterId, String imageUID, String postDesc, String timestamp)
+    public ImagePost(String posterId, String imageUID, String postDesc)
     {
         super();
         setPosterId(posterId);
         setImageUID(imageUID);
         setPostDesc(postDesc);
-        setTimeStamp(timestamp);
     }
 }

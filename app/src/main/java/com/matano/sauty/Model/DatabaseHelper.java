@@ -2,9 +2,12 @@ package com.matano.sauty.Model;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -14,6 +17,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +35,7 @@ public class DatabaseHelper
     private DatabaseReference rootDatabaseRef = FirebaseDatabase.getInstance().getReference();
     private final String TAG = DatabaseHelper.class.getSimpleName();
     private SautyUser sautyUser;
+    private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
 
 
@@ -60,10 +67,30 @@ public class DatabaseHelper
         return sautyUser;
     }
 
+    //DatabaseHelper Interfaces
+
     public interface userFinishedSettingListener
     {
-        public void onSuccess(SautyUser user);
-        public void onFailed();
+        void onSuccess(SautyUser user);
+        void onFailed();
+    }
+
+    public interface photoUploadToStorageListener
+    {
+        void onPhotoUploadSuccess(String downloadUrl);
+        void onPhotoUploadFailed();
+    }
+
+    public interface imageAddedListener
+    {
+        void onImageAddedSuccess(String imageUID);
+        void onImageAddedFailed();
+    }
+
+    public interface postAddedListener
+    {
+        void onPostAddedSuccess();
+        void onPostAddedFailed();
     }
 
     public void addNewUserInDatabase(FirebaseUser firebaseUser, final userFinishedSettingListener listener)
@@ -131,10 +158,8 @@ public class DatabaseHelper
                         {
                             Log.d(TAG, dataSnapshot.getKey());
                             Log.d(TAG, dataSnapshot.toString());
-                          //  Map<String, Object> map;
                             sautyUser =  dataSnapshot.getValue(SautyUser.class);
 
-                            //sautyUser = (SautyUser) map.get(firebaseUser.getUid());
                             listener.onSuccess(sautyUser);
                         }
 
@@ -147,4 +172,182 @@ public class DatabaseHelper
         }
     }
 
+    public void addImage(String downloadUri, final imageAddedListener listener)
+    {
+        if (firebaseAuth.getCurrentUser() != null)
+        {
+            DatabaseReference imageRef = rootDatabaseRef.child("images");
+
+            //Get Unique Key for the Image
+            final String imageUid = imageRef.push().getKey();
+            SautyImage image = new SautyImage(downloadUri, firebaseAuth.getCurrentUser().getUid()
+            , imageUid);
+
+            Map<String , Object> childUpdates = new HashMap<>();
+            childUpdates.put("/images/" + imageUid, image);
+            childUpdates.put("/usersUploadedImages/" + firebaseAuth.getCurrentUser().getUid()
+            + "/" + imageUid, true);
+
+            rootDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(
+                    new OnCompleteListener<Void>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+                                listener.onImageAddedSuccess(imageUid);
+                            }
+                            else
+                            {
+                                listener.onImageAddedFailed();
+                            }
+                        }
+                    }
+            );
+
+        }
+    }
+
+    public void addNewPost(String imageUID, String descText, final postAddedListener listener)
+    {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null)
+        {
+            final Post post;
+
+            if (!TextUtils.isEmpty(descText))
+            {
+                //Post has a description
+                 post = new ImagePost(firebaseUser.getUid(),
+                        imageUID , descText);
+            }
+            else
+            {
+                //post Doesn't have a description;
+                 post = new ImagePost(firebaseUser.getUid(),
+                        imageUID);
+            }
+
+
+            DatabaseReference postRef = rootDatabaseRef.child("posts");
+            final String postUID = postRef.push().getKey();
+            post.setPostId(postUID);
+
+            Map<String , Object> childUpdates = new HashMap<>();
+
+            childUpdates.put("/posts/" + postUID , post);
+            childUpdates.put("/userPosts/" + firebaseUser.getUid() +"/" + postUID, true);
+            childUpdates.put("/usersWalls/" + firebaseUser.getUid() + "/" + postUID, true);
+
+            rootDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(
+                    new OnCompleteListener<Void>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+                                listener.onPostAddedSuccess();
+                            }
+                            else
+                            {
+                                Log.d(TAG, "Failed to add new Post", task.getException());
+                            }
+                        }
+                    }
+            );
+        }
+
+    }
+
+    private void addPostToUserPosts(String postUID)
+    {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null)
+        {
+            DatabaseReference userPostsRef = rootDatabaseRef.child("usersPosts");
+            userPostsRef.child(firebaseUser.getUid()).setValue(postUID)
+                    .addOnCompleteListener(new OnCompleteListener<Void>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+                                Log.d(TAG, "Post added to UserPost");
+                            }
+                            else
+                            {
+                                Log.d(TAG, "Failed to add Post to UserPost", task.getException());
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void addPostToUserWalls(String postUID)
+    {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null)
+        {
+            DatabaseReference userWallsRef = rootDatabaseRef.child("usersWalls");
+            userWallsRef.child(firebaseUser.getUid()).setValue("userPosts/" + postUID)
+                    .addOnCompleteListener(new OnCompleteListener<Void>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task)
+                        {
+                            if (task.isSuccessful())
+                            {
+                                Log.d(TAG, "Post added To Users Walls");
+                            }
+                            else
+                            {
+                                Log.d(TAG, "Failed to add Post to Users Walls");
+                            }
+                        }
+                    });
+        }
+    }
+
+    public void uploadPhoto(Uri imageUri, String type, final photoUploadToStorageListener listener)
+    {
+        if (firebaseAuth.getCurrentUser() != null  && type != null)
+        {
+            StorageReference uploadingImageReferencePoint = storageReference
+                    .child(firebaseAuth.getCurrentUser().getUid() +"/images/"+ System.currentTimeMillis()
+                    + "." + type);
+
+            uploadingImageReferencePoint.putFile(imageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
+                    {
+
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
+                        {
+                            if (taskSnapshot != null)
+                            {
+                                @SuppressWarnings("VisibleForTests")
+                                String downloadUrl = taskSnapshot.getDownloadUrl().toString();
+
+                                listener.onPhotoUploadSuccess(downloadUrl);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener()
+                    {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+                            listener.onPhotoUploadFailed();
+                        }
+                    });
+        }
+
+    }
+
+
+
 }
+

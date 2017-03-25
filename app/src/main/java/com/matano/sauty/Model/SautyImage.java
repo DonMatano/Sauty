@@ -7,7 +7,7 @@ package com.matano.sauty.Model;
 public class SautyImage
 {
     private String imageUrl;
-    private String imageName;
+    private String imageUID;
     private int imageLikes;
     private int imageSaves;
     private int imageShares;
@@ -17,11 +17,11 @@ public class SautyImage
     {
     }
 
-    public SautyImage(String imageUrl, String imageName, String originalPoster)
+    public SautyImage(String imageUrl, String originalPoster, String imageUID)
     {
         this.imageUrl = imageUrl;
-        this.imageName = imageName;
         this.originalPoster = originalPoster;
+        this.imageUID = imageUID;
     }
 
     public String getImageUrl()
@@ -34,15 +34,19 @@ public class SautyImage
         this.imageUrl = imageUrl;
     }
 
-    public String getImageName()
+
+
+    public String getImageUID()
     {
-        return imageName;
+        return imageUID;
     }
 
-    public void setImageName(String imageName)
+    public void setImageUID(String imageUID)
     {
-        this.imageName = imageName;
+        this.imageUID = imageUID;
     }
+
+
 
     public int getImageLikes()
     {

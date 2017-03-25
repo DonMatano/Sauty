@@ -38,7 +38,7 @@ public class FeedFragment extends Fragment
     FirebaseAuth firebaseAuth;
     DatabaseHelper databaseHelper;
     FirebaseIndexRecyclerAdapter<Post , PostHolder> recyclerAdapter;
-    FabButtonClickedListenter listenter;
+    FabButtonClickedListener listener;
 
     public static FeedFragment newInstance(SautyUser sautyUser)
     {
@@ -57,7 +57,7 @@ public class FeedFragment extends Fragment
         super.onAttach(context);
         try
         {
-            listenter = (FabButtonClickedListenter) context;
+            listener = (FabButtonClickedListener) context;
         }
         catch (ClassCastException e) {
             throw new ClassCastException(context.toString() +
@@ -75,11 +75,6 @@ public class FeedFragment extends Fragment
         databaseHelper = DatabaseHelper.getInstance();
     }
 
-    private void setFabButtonClickedListener(FabButtonClickedListenter listener)
-    {
-        this.listenter = listener;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -95,7 +90,7 @@ public class FeedFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                listenter.onAddPostFabButtonClicked();
+                listener.onAddPostFabButtonClicked();
             }
         });
         fragmentConstraintLayout = (ConstraintLayout) v.findViewById(R.id.feedsFragmentConstriantLayout);
@@ -109,7 +104,7 @@ public class FeedFragment extends Fragment
     {
         if (firebaseAuth.getCurrentUser() != null)
         {
-            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("usersFeeds");
+            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("userWalls");
             userFeedRef.child(firebaseAuth.getCurrentUser().getUid())
                     .addListenerForSingleValueEvent(new ValueEventListener()
             {
@@ -140,7 +135,17 @@ public class FeedFragment extends Fragment
 
     private void showFeed()
     {
-
+//        recyclerAdapter = new FirebaseIndexRecyclerAdapter<Post, PostHolder>(
+//                Post.class, android.R.layout.two_line_list_item, PostHolder.class,
+//
+//        )
+//        {
+//            @Override
+//            protected void populateViewHolder(PostHolder viewHolder, Post model, int position)
+//            {
+//
+//            }
+//        }
     }
 
     private void showNoFeed()
@@ -154,7 +159,7 @@ public class FeedFragment extends Fragment
         fragmentConstraintLayout.addView(noPostTextView);
     }
 
-    interface FabButtonClickedListenter
+    interface FabButtonClickedListener
     {
         void onAddPostFabButtonClicked();
 

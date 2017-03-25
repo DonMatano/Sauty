@@ -1,38 +1,65 @@
 package com.matano.sauty;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.matano.sauty.Model.DatabaseHelper;
 
 /**
  * Created by matano on 23/3/17.
  */
 
-public class AddPostFragment extends Fragment implements View.OnClickListener
+public class AddPostFragment extends Fragment implements View.OnClickListener,
+        DatabaseHelper.photoUploadToStorageListener, DatabaseHelper.imageAddedListener,
+        DatabaseHelper.postAddedListener
 {
     private ImageView addPhotoImageView;
     private EditText descEditText;
+    ProgressDialog progressDialog;
     private Button addPostButton;
     private final int PICK_IMAGE_REQUEST = 6;
+    Uri imageUri;
+    DatabaseHelper databaseHelper;
+    onPostAddedListener onPostAddedListener;
+    static final String TAG = AddPostFragment.class.getSimpleName();
+
+    public interface onPostAddedListener
+    {
+        void postAddedSuccessfully();
+    }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
+        databaseHelper = DatabaseHelper.getInstance();
+
+        try
+        {
+            onPostAddedListener = (onPostAddedListener) context;
+        }
+        catch (ClassCastException e)
+        {
+            throw new ClassCastException(context.toString() +
+                    " must implement OnArticleSelectedListener");
+        }
 
     }
 
@@ -46,6 +73,12 @@ public class AddPostFragment extends Fragment implements View.OnClickListener
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -56,6 +89,16 @@ public class AddPostFragment extends Fragment implements View.OnClickListener
         descEditText = (EditText) v.findViewById(R.id.descEditText);
         addPostButton = (Button) v.findViewById(R.id.post_OK_button);
 
+        addPostButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Log.d(TAG, "add Post Button Clicked");
+                addPost();
+            }
+        });
+
 
         return v;
     }
@@ -63,20 +106,24 @@ public class AddPostFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
-        if (v.getId() == R.id.addPhotoImageView)
+        if (v == addPhotoImageView)
         {
             getPhotoFromPhone();
         }
-
-        if (v.getId() == R.id.post_OK_button)
-        {
-            addPost();
-        }
     }
 
-    private void addPost()
+     void addPost()
     {
 
+        ContentResolver cR = getContext().getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        String type = mime.getExtensionFromMimeType(cR.getType(imageUri));
+
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle(getString(R.string.uploading_photo));
+        progressDialog.show();
+
+        databaseHelper.uploadPhoto(imageUri , type, this);
     }
 
     private void getPhotoFromPhone()
@@ -97,11 +144,56 @@ public class AddPostFragment extends Fragment implements View.OnClickListener
                 && data.getData() != null) {
 
             addPhotoImageView.setImageDrawable(null);
-            Uri imageUri = data.getData();
+            imageUri = data.getData();
 
             Glide.with(getContext()).load(imageUri)
                     .crossFade()
                     .into(addPhotoImageView);
         }
+    }
+
+    //Photo upload listeners
+    @Override
+    public void onPhotoUploadSuccess(String downloadUri)
+    {
+        progressDialog.setTitle("Adding Image.....");
+        databaseHelper.addImage(downloadUri, this);
+    }
+
+    @Override
+    public void onImageAddedSuccess(String imageUID)
+    {
+        progressDialog.setTitle("Adding Post.....");
+        progressDialog.show();
+        databaseHelper.addNewPost(imageUID, descEditText.getText().toString().trim(), this);
+    }
+
+    @Override
+    public void onImageAddedFailed()
+    {
+    }
+
+    @Override
+    public void onPhotoUploadFailed()
+    {
+        Toast.makeText(getContext(), getText(R.string.failed_uploading_photo), Toast.LENGTH_SHORT).show();
+    }
+
+    //Post added Listeners
+
+
+    @Override
+    public void onPostAddedSuccess()
+    {
+        progressDialog.dismiss();
+        onPostAddedListener.postAddedSuccessfully();
+
+    }
+
+    @Override
+    public void onPostAddedFailed()
+    {
+        progressDialog.dismiss();
+        Toast.makeText(getContext(), "Failed to add Post" , Toast.LENGTH_SHORT).show();
     }
 }

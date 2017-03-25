@@ -1,5 +1,11 @@
 package com.matano.sauty.Model;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by matano on 19/3/17.
  */
@@ -13,7 +19,7 @@ public abstract class Post
     private String postDesc;
     private String imageUID;
     private String audioUID;
-    private String timeStamp;
+    private Long dateCreated;
 
     public Post()
     {
@@ -37,15 +43,11 @@ public abstract class Post
         this.posterId = posterId;
     }
 
-    public String getTimeStamp()
+    public Map<String, String> getDateCreated()
     {
-        return timeStamp;
+        return ServerValue.TIMESTAMP;
     }
 
-    public void setTimeStamp(String timeStamp)
-    {
-        this.timeStamp = timeStamp;
-    }
 
     public String getPostId()
     {
@@ -115,5 +117,16 @@ public abstract class Post
     public void setAudioUID(String audioUID)
     {
         this.audioUID = audioUID;
+    }
+
+    @Exclude
+    public Long getDateCreatedLong()
+    {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Long dateCreated)
+    {
+        this.dateCreated = dateCreated;
     }
 }

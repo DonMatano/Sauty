@@ -40,6 +40,9 @@ Integer suscipit gravida leo eu ultricies. Nunc efficitur consectetur maximus. N
         There is no posts to your wall.
         Follow someone in the Discover Tab or add a post by pressing the add post button below.
     </string>
+    <string name="uploading_photo">Uploading Photo.......</string>
+    <string name="failed_uploading_photo">Error! Failed to upload Photo</string>
+    <string name="uploading__post">Adding your post......</string>
 
 
 </resources>
