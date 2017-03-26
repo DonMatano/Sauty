@@ -8,14 +8,29 @@
               android:isScrollContainer="true"
               android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/posterProfileName"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_weight="0.00"
-        android:contentDescription="@string/user_name_description"
-        tools:drawableLeft="@drawable/com_facebook_profile_picture_blank_square"
-        tools:text="Mwakima Matano"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:orientation="horizontal"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/posterProfilePic"
+            android:layout_width="76dp"
+            android:layout_height="51dp"
+            android:contentDescription="@string/user_profile_image"
+            app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"/>
+
+        <TextView
+            android:id="@+id/posterProfileName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:contentDescription="@string/user_name_description"
+            tools:text="Mwakima Matano"/>
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/postImageView"

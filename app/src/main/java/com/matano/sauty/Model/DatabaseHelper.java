@@ -62,11 +62,6 @@ public class DatabaseHelper
         return rootDatabaseRef;
     }
 
-    public SautyUser getSautyUser()
-    {
-        return sautyUser;
-    }
-
     //DatabaseHelper Interfaces
 
     public interface userFinishedSettingListener
@@ -91,6 +86,97 @@ public class DatabaseHelper
     {
         void onPostAddedSuccess();
         void onPostAddedFailed();
+    }
+
+    public interface UserGottenListener
+    {
+        void onUserGotten(SautyUser user);
+    }
+
+    public interface ImageGottenListener
+    {
+        void onImageGotten(SautyImage image);
+    }
+
+    public void getUser(String userUID, final UserGottenListener listener)
+    {
+        DatabaseReference userRef = rootDatabaseRef.child("/users/" + userUID);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+
+                if (dataSnapshot != null)
+                {
+                    Log.d(TAG, dataSnapshot.getKey());
+                    SautyUser user = dataSnapshot.getValue(SautyUser.class);
+                    listener.onUserGotten(user);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    public void getImage(String imageUID, final ImageGottenListener listener)
+    {
+        DatabaseReference userRef = rootDatabaseRef.child("/images/" + imageUID);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+
+                if (dataSnapshot != null)
+                {
+                    Log.d(TAG, dataSnapshot.getKey());
+                    SautyImage image = dataSnapshot.getValue(SautyImage.class);
+                    listener.onImageGotten(image);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+    }
+
+    public void getPosts()
+    {
+        DatabaseReference postRef = rootDatabaseRef.child("/posts/");
+        postRef.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
+                {
+                    Log.d(TAG, snapshot.toString());
+
+                    Post post = snapshot.getValue(Post.class);
+                    Log.d(TAG, post.toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
     }
 
     public void addNewUserInDatabase(FirebaseUser firebaseUser, final userFinishedSettingListener listener)
@@ -209,30 +295,29 @@ public class DatabaseHelper
         }
     }
 
-    public void addNewPost(String imageUID, String descText, final postAddedListener listener)
+    public void addNewImagePost(String imageUID, String descText, final postAddedListener listener)
     {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null)
         {
-            final Post post;
+            Post post;
+
+            DatabaseReference postRef = rootDatabaseRef.child("posts");
+            final String postUID = postRef.push().getKey();
 
             if (!TextUtils.isEmpty(descText))
             {
                 //Post has a description
-                 post = new ImagePost(firebaseUser.getUid(),
-                        imageUID , descText);
+                 post = new Post(postUID, firebaseUser.getUid(),
+                         descText);
             }
             else
             {
                 //post Doesn't have a description;
-                 post = new ImagePost(firebaseUser.getUid(),
-                        imageUID);
+                 post = new Post(postUID, firebaseUser.getUid());
             }
 
-
-            DatabaseReference postRef = rootDatabaseRef.child("posts");
-            final String postUID = postRef.push().getKey();
-            post.setPostId(postUID);
+            post.setImageUID(imageUID);
 
             Map<String , Object> childUpdates = new HashMap<>();
 
@@ -261,55 +346,7 @@ public class DatabaseHelper
 
     }
 
-    private void addPostToUserPosts(String postUID)
-    {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null)
-        {
-            DatabaseReference userPostsRef = rootDatabaseRef.child("usersPosts");
-            userPostsRef.child(firebaseUser.getUid()).setValue(postUID)
-                    .addOnCompleteListener(new OnCompleteListener<Void>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task)
-                        {
-                            if (task.isSuccessful())
-                            {
-                                Log.d(TAG, "Post added to UserPost");
-                            }
-                            else
-                            {
-                                Log.d(TAG, "Failed to add Post to UserPost", task.getException());
-                            }
-                        }
-                    });
-        }
-    }
 
-    private void addPostToUserWalls(String postUID)
-    {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null)
-        {
-            DatabaseReference userWallsRef = rootDatabaseRef.child("usersWalls");
-            userWallsRef.child(firebaseUser.getUid()).setValue("userPosts/" + postUID)
-                    .addOnCompleteListener(new OnCompleteListener<Void>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task)
-                        {
-                            if (task.isSuccessful())
-                            {
-                                Log.d(TAG, "Post added To Users Walls");
-                            }
-                            else
-                            {
-                                Log.d(TAG, "Failed to add Post to Users Walls");
-                            }
-                        }
-                    });
-        }
-    }
 
     public void uploadPhoto(Uri imageUri, String type, final photoUploadToStorageListener listener)
     {

@@ -165,7 +165,7 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
     {
         progressDialog.setTitle("Adding Post.....");
         progressDialog.show();
-        databaseHelper.addNewPost(imageUID, descEditText.getText().toString().trim(), this);
+        databaseHelper.addNewImagePost(imageUID, descEditText.getText().toString().trim(), this);
     }
 
     @Override

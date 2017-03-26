@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by matano on 19/3/17.
  */
 
-public abstract class Post
+public class Post
 {
     private String postId;
     private int postLikes = 0;
@@ -128,5 +128,11 @@ public abstract class Post
     public void setDateCreated(Long dateCreated)
     {
         this.dateCreated = dateCreated;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getImageUID()+", "+getPostDesc()+", "+getPosterId()+", "+getPosterId();
     }
 }

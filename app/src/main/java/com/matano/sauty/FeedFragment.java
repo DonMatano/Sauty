@@ -15,14 +15,18 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseIndexRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.matano.sauty.Model.DatabaseHelper;
 import com.matano.sauty.Model.Post;
+import com.matano.sauty.Model.SautyImage;
 import com.matano.sauty.Model.SautyUser;
 
 /**
@@ -39,6 +43,7 @@ public class FeedFragment extends Fragment
     DatabaseHelper databaseHelper;
     FirebaseIndexRecyclerAdapter<Post , PostHolder> recyclerAdapter;
     FabButtonClickedListener listener;
+    Context context;
 
     public static FeedFragment newInstance(SautyUser sautyUser)
     {
@@ -58,6 +63,7 @@ public class FeedFragment extends Fragment
         try
         {
             listener = (FabButtonClickedListener) context;
+            this.context = context;
         }
         catch (ClassCastException e) {
             throw new ClassCastException(context.toString() +
@@ -82,7 +88,9 @@ public class FeedFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_feed, container, false);
         recycler = (RecyclerView) v.findViewById(R.id.fragment_recycler);
         recycler.setHasFixedSize(false);
-        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+//        layoutManager.setReverseLayout(true);
+        recycler.setLayoutManager(layoutManager);
         fab = (FloatingActionButton) v.findViewById(R.id.add_new_post_fab);
 
         fab.setOnClickListener(new View.OnClickListener()
@@ -100,11 +108,18 @@ public class FeedFragment extends Fragment
         return v;
     }
 
+    @Override
+    public void onDestroy()
+    {
+        recyclerAdapter.cleanup();
+        super.onDestroy();
+    }
+
     private void isTherePosts()
     {
         if (firebaseAuth.getCurrentUser() != null)
         {
-            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("userWalls");
+            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("/usersWalls/");
             userFeedRef.child(firebaseAuth.getCurrentUser().getUid())
                     .addListenerForSingleValueEvent(new ValueEventListener()
             {
@@ -135,17 +150,60 @@ public class FeedFragment extends Fragment
 
     private void showFeed()
     {
-//        recyclerAdapter = new FirebaseIndexRecyclerAdapter<Post, PostHolder>(
-//                Post.class, android.R.layout.two_line_list_item, PostHolder.class,
-//
-//        )
-//        {
-//            @Override
-//            protected void populateViewHolder(PostHolder viewHolder, Post model, int position)
-//            {
-//
-//            }
-//        }
+        if (firebaseAuth.getCurrentUser() != null)
+        {
+            Query keyRef = databaseHelper.getRootDatabaseRef().child(
+                    "/usersWalls/" + firebaseAuth.getCurrentUser().getUid());
+
+            Query dataRef = databaseHelper.getRootDatabaseRef().child(
+                    "/posts/");
+
+            recyclerAdapter = new FirebaseIndexRecyclerAdapter<Post, PostHolder>(
+                    Post.class, R.layout.post_view, PostHolder.class,
+                    keyRef, dataRef)
+            {
+
+                //Don't even Ask what the fuck is happening below.
+
+                @Override
+                protected void populateViewHolder(final PostHolder postHolder, final Post post, int position)
+                {
+                    //Adding a listener to know when a User has been gotten in the database.
+
+                    DatabaseHelper.UserGottenListener userGottenListener = new DatabaseHelper.UserGottenListener()
+                    {
+                        //Called when User is gotten
+                        @Override
+                        public void onUserGotten(SautyUser user)
+                        {
+                            //After User is gotten we get the Imaged
+                            DatabaseHelper.ImageGottenListener imageGottenListener = new DatabaseHelper.ImageGottenListener()
+                            {
+                                //Called when image is gotten back
+                                @Override
+                                public void onImageGotten(SautyImage image)
+                                {
+                                    //We now populate the view
+                                    postHolder.setPosterProfilePic(sautyUser.getUserProfilePic() , context);
+                                    postHolder.setPosterProfileName(sautyUser.getUserName());
+                                    postHolder.setPostImage(image.getImageUrl(), context);
+                                    postHolder.setPostDescriptionTextView(post.getPostDesc());
+                                }
+                            };
+                            //getting the image
+                            databaseHelper.getImage(post.getImageUID(), imageGottenListener);
+                        }
+                    };
+                    //getting the user
+                    databaseHelper.getUser(post.getPosterId(), userGottenListener);
+
+                }
+            };
+
+            recycler.setAdapter(recyclerAdapter);
+
+            //databaseHelper.getPosts();
+        }
     }
 
     private void showNoFeed()
@@ -171,6 +229,7 @@ public class FeedFragment extends Fragment
     private static class PostHolder extends RecyclerView.ViewHolder
     {
         TextView posterProfileName;
+        ImageView posterProfilePic;
         ImageView postImageView;
         ImageButton likeImageButton;
         ImageButton shareImageButton;
@@ -181,12 +240,45 @@ public class FeedFragment extends Fragment
         {
             super(itemView);
             posterProfileName = (TextView) itemView.findViewById(R.id.posterProfileName);
+            posterProfilePic = (ImageView) itemView.findViewById(R.id.posterProfilePic);
             postImageView = (ImageView) itemView.findViewById(R.id.postImageView);
             likeImageButton = (ImageButton) itemView.findViewById(R.id.likeImageButton);
             shareImageButton = (ImageButton) itemView.findViewById(R.id.shareImageButton);
             saveImageButton = (ImageButton) itemView.findViewById(R.id.saveImageButton);
             postDescriptionTextView = (TextView) itemView.findViewById(R.id.post_text_description);
         }
+
+
+        void setPosterProfileName(String profileName)
+        {
+            posterProfileName.setText(profileName);
+        }
+
+        void setPostImage(String downloadImage, Context context)
+        {
+            Glide.with(context)
+                    .load(downloadImage)
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(postImageView);
+        }
+
+        void setPostDescriptionTextView(String postDescription)
+        {
+            postDescriptionTextView.setText(postDescription);
+        }
+
+        void setPosterProfilePic(String profilePic, Context context)
+        {
+            Glide.with(context).
+                    load(profilePic)
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(posterProfilePic);
+        }
+
+
+
     }
 
 
