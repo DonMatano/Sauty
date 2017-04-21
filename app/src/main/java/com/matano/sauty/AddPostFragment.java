@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +76,7 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        imageUri = null;
     }
 
     @Nullable
@@ -94,7 +94,6 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
             @Override
             public void onClick(View v)
             {
-                Log.d(TAG, "add Post Button Clicked");
                 addPost();
             }
         });
@@ -114,16 +113,28 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
 
      void addPost()
     {
-
-        ContentResolver cR = getContext().getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        String type = mime.getExtensionFromMimeType(cR.getType(imageUri));
-
         progressDialog = new ProgressDialog(getContext());
-        progressDialog.setTitle(getString(R.string.uploading_photo));
-        progressDialog.show();
 
-        databaseHelper.uploadPhoto(imageUri , type, this);
+        //Check if post has image
+        if (imageUri != null)
+        {
+            progressDialog.setTitle(getString(R.string.uploading_photo));
+            progressDialog.show();
+            ContentResolver cR = getContext().getContentResolver();
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            String type = mime.getExtensionFromMimeType(cR.getType(imageUri));
+            databaseHelper.uploadPhoto(imageUri , type, this);
+
+        }
+        else
+        {
+            //Post has no image
+            progressDialog.setTitle(getString(R.string.uploading__post));
+            progressDialog.show();
+            databaseHelper.addNewPost(null, descEditText.getText().toString().trim(), this);
+
+        }
+
     }
 
     private void getPhotoFromPhone()
@@ -165,7 +176,7 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
     {
         progressDialog.setTitle("Adding Post.....");
         progressDialog.show();
-        databaseHelper.addNewImagePost(imageUID, descEditText.getText().toString().trim(), this);
+        databaseHelper.addNewPost(imageUID, descEditText.getText().toString().trim(), this);
     }
 
     @Override

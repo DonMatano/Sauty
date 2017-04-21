@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:scrollIndicators="end"
+    android:scrollbars="vertical">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/postViewLinearLayoutAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:isScrollContainer="true"
+        android:orientation="vertical"
+        android:scrollIndicators="end"
+        android:scrollbarFadeDuration="?android:attr/scrollbarDefaultDelayBeforeFade"
+        android:scrollbarSize="?android:attr/scrollbarSize"
+        android:scrollbars="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="91dp">
+
+
+        <ImageView
+            android:id="@+id/fullPostposterProfilePic"
+            android:layout_width="53dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/user_profile_image"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"
+            tools:ignore="RtlHardcoded"/>
+
+        <TextView
+            android:id="@+id/posterProfileName"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/user_name_description"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/com_facebook_button_background_color_selected"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/guideline"
+            app:layout_constraintHorizontal_bias="0.106"
+            app:layout_constraintLeft_toRightOf="@+id/fullPostposterProfilePic"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fullPostposterProfilePic"
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="RtlHardcoded"
+            tools:text="Mwakima Matano"/>
+
+
+        <ImageView
+            android:id="@+id/postfeedImageView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/image_post_describtion"
+            android:minHeight="219dp"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline"
+            tools:layout_constraintLeft_creator="1"
+            tools:layout_constraintRight_creator="1"
+            tools:layout_constraintTop_creator="1"
+            tools:srcCompat="@drawable/ic_add_a_photo_black_24dp"/>
+
+
+        <ImageButton
+            android:id="@+id/feedlikeImageButton"
+            android:layout_width="43dp"
+            android:layout_height="37dp"
+            android:layout_marginLeft="74dp"
+            android:layout_marginStart="74dp"
+            android:background="@null"
+            android:contentDescription="@string/like_image"
+            app:layout_constraintBottom_toTopOf="@+id/post_feed_text_description"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postfeedImageView"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/ic_thumb_up_unclicked"
+            tools:ignore="RtlHardcoded"/>
+
+        <ImageButton
+            android:id="@+id/postfeedshareImageButton"
+            android:layout_width="36dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="134dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:background="@null"
+            android:contentDescription="@string/share_description"
+            app:layout_constraintHorizontal_bias="0.902"
+            app:layout_constraintLeft_toRightOf="@+id/likesCounttextView"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postfeedImageView"
+            app:srcCompat="@android:drawable/ic_menu_share"/>
+
+
+        <TextView
+            android:id="@+id/post_feed_text_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:fadeScrollbars="true"
+            android:gravity="start"
+            android:isScrollContainer="false"
+            android:maxHeight="98dp"
+            android:minHeight="26dp"
+            android:scrollHorizontally="false"
+            android:scrollIndicators="right"
+            android:scrollbarFadeDuration="?android:attr/scrollbarFadeDuration"
+            android:scrollbarSize="?android:attr/scrollbarSize"
+            android:scrollbars="vertical"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postfeedshareImageButton"
+            tools:targetApi="m"
+            tools:text="@string/lorae_ipsum_text"/>
+
+        <EditText
+            android:id="@+id/userCommentEditText"
+            android:layout_width="250dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:hint="@string/add_comment_text"
+            android:inputType="textMultiLine"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/commentTextView"/>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="58dp"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="139dp"/>
+
+        <TextView
+            android:id="@+id/commentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="@string/comment_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/com_facebook_button_background_color_selected"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_feed_text_description"/>
+
+        <TextView
+            android:id="@+id/likesCounttextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/com_facebook_button_send_background_color"
+            app:layout_constraintLeft_toRightOf="@+id/feedlikeImageButton"
+            app:layout_constraintTop_toTopOf="@+id/feedlikeImageButton"
+            tools:text="55555"/>
+
+        <TextView
+            android:id="@+id/shareCountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/com_facebook_messenger_blue"
+            app:layout_constraintLeft_toRightOf="@+id/postfeedshareImageButton"
+            app:layout_constraintTop_toTopOf="@+id/postfeedshareImageButton"
+            tools:text="25"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/commentsRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:maxHeight="300dp"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userCommentEditText"
+            tools:listitem="@layout/comment_view"/>
+
+        <Button
+            android:id="@+id/commentButton"
+            android:layout_width="105dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="38dp"
+            android:text="@string/post_comment_text"
+            app:layout_constraintHorizontal_bias="0.166"
+            app:layout_constraintLeft_toRightOf="@+id/userCommentEditText"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/post_feed_text_description"
+            />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

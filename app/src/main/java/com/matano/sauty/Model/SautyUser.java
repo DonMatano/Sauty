@@ -21,6 +21,8 @@ public class SautyUser implements Parcelable
     private String userEmail;
     private String userUid;
     private int userFollowersCount = 0;
+    private int invertedFollowersCount = 0;
+    private int invertedFollowingCount = 0;
     private int userFollowingCount = 0;
     private int age;
     private String userStatus;
@@ -105,6 +107,26 @@ public class SautyUser implements Parcelable
         this.userFollowersCount = userFollowersCount;
     }
 
+    public int getInvertedFollowersCount()
+    {
+        return invertedFollowersCount;
+    }
+
+    public void setInvertedFollowersCount(int invertedFollowersCount)
+    {
+        this.invertedFollowersCount = invertedFollowersCount;
+    }
+
+    public int getInvertedFollowingCount()
+    {
+        return invertedFollowingCount;
+    }
+
+    public void setInvertedFollowingCount(int invertedFollowingCount)
+    {
+        this.invertedFollowingCount = invertedFollowingCount;
+    }
+
     public String getUserLikedPostsUID()
     {
         return userLikedPostsUID;
@@ -170,6 +192,8 @@ public class SautyUser implements Parcelable
         dest.writeString(this.userEmail);
         dest.writeString(this.userUid);
         dest.writeInt(this.userFollowersCount);
+        dest.writeInt(this.invertedFollowersCount);
+        dest.writeInt(this.invertedFollowingCount);
         dest.writeInt(this.userFollowingCount);
         dest.writeInt(this.age);
         dest.writeString(this.userStatus);
@@ -184,6 +208,8 @@ public class SautyUser implements Parcelable
         this.userEmail = in.readString();
         this.userUid = in.readString();
         this.userFollowersCount = in.readInt();
+        this.invertedFollowersCount = in.readInt();
+        this.invertedFollowingCount = in.readInt();
         this.userFollowingCount = in.readInt();
         this.age = in.readInt();
         this.userStatus = in.readString();

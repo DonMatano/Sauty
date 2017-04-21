@@ -43,6 +43,42 @@ Integer suscipit gravida leo eu ultricies. Nunc efficitur consectetur maximus. N
     <string name="uploading_photo">Uploading Photo.......</string>
     <string name="failed_uploading_photo">Error! Failed to upload Photo</string>
     <string name="uploading__post">Adding your post......</string>
+    <string name="editProfileText">Edit Profile</string>
+    <string name="user_name_text">User Name</string>
+    <string name="status_textview_text">Status</string>
+    <string name="edit_profile_image_desc">Edit your profile Image</string>
+    <string name="comment_text">Comments</string>
+    <string name="add_comment_text">Add Comment</string>
+    <string name="view_comments">View Comments</string>
+    <string name="trending_Posts">Trending Posts</string>
+    <string name="popular_people">Popular</string>
+    <string name="profile_image_contdesc">This is a profile pic</string>
+    <string name="follow_text">FOLLOW</string>
+    <string name="unfollow_text">UNFOLLOW</string>
+    <string name="post_comment_text">Comment</string>
+    <string name="number_of_following">Following %1$d</string>
+
+    <plurals name="numberOfCommentsAvailable">
+        <!--
+             As a developer, you should always supply "one" and "other"
+             strings. Your translators will know which strings are actually
+             needed for their language. Always include %d in "one" because
+             translators will need to use %d for languages where "one"
+             doesn't mean 1 (as explained above).
+          -->
+        <item quantity="one">%d comment.</item>
+        <item quantity="other">%d comments.</item>
+    </plurals>
+
+    <plurals name="numberOfFollowers">
+        <item quantity="one">%d follower</item>
+        <item quantity="other">%d followers</item>
+    </plurals>
+
+    <plurals name="numberOfLikes">
+        <item quantity="one">%d like</item>
+        <item quantity="other">%d likes</item>
+    </plurals>
 
 
 </resources>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/commentViewCommentorNameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textAlignment="viewStart"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:textColor="@color/com_facebook_button_background_color_selected"
+        android:textStyle="bold"
+        android:typeface="sans"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Mwakima Matano"/>
+
+    <TextView
+        android:id="@+id/commentOrCommentTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:padding="5dp"
+        android:scrollbarFadeDuration="?android:attr/scrollbarFadeDuration"
+        android:scrollbars="vertical"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.142"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commentViewCommentorNameTextView"
+        tools:text="@string/lorae_ipsum_text"/>
+
+    <ImageButton
+        android:id="@+id/likeButton"
+        android:layout_width="48dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:background="@null"
+        android:contentDescription="@string/like_image"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commentOrCommentTextView"
+        app:srcCompat="@drawable/ic_thumb_up_unclicked"/>
+
+    <TextView
+        android:id="@+id/likeCounts"
+        android:layout_width="62dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="22dp"
+        android:paddingTop="5dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textColorLink="@drawable/com_facebook_button_send_background"
+        app:layout_constraintLeft_toRightOf="@+id/likeButton"
+        app:layout_constraintTop_toBottomOf="@+id/commentOrCommentTextView"
+        tools:text="555555"/>
+</android.support.constraint.ConstraintLayout>

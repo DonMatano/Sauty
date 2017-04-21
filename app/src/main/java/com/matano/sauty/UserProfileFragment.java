@@ -1,17 +1,15 @@
 package com.matano.sauty;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,11 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.matano.sauty.Model.DatabaseHelper;
@@ -35,54 +29,47 @@ import com.matano.sauty.Model.SautyImage;
 import com.matano.sauty.Model.SautyUser;
 
 /**
- * Created by matano on 17/3/17.
+ * Created by matano on 19/4/17.
  */
 
-public class FeedFragment extends Fragment
+public class UserProfileFragment extends Fragment
+        implements  DatabaseHelper.UserGottenListener
 {
-    SautyUser sautyUser;
-    RecyclerView recycler;
-    FloatingActionButton fab;
-    ConstraintLayout fragmentConstraintLayout;
-    FirebaseAuth firebaseAuth;
-    DatabaseHelper databaseHelper;
+    ImageView userProfileImageView;
+    TextView userNameTextView;
+    TextView userFollowersCountTextView;
+    TextView userFollowingCountTextView;
+    Button userFollowUnfollowingButton;
+    TextView userStatusTextView;
+    RecyclerView userPostsRecyclerView;
     FirebaseRecyclerAdapter<Post, PostHolder> recyclerAdapter;
-    FabButtonClickedListener listener;
-    PostClickedListener postClickedListener;
-    UserProfileClickedListener userProfileClickedListener;
+    DatabaseHelper databaseHelper;
+    FeedFragment.PostClickedListener postClickedListener;
+    FeedFragment.UserProfileClickedListener userProfileClickedListener;
+    FirebaseAuth firebaseAuth;
+    SautyUser user;
     Context context;
-    ProgressDialog progressDialog;
 
-    public static FeedFragment newInstance(SautyUser sautyUser)
+    public static UserProfileFragment newInstance(String userID)
     {
 
         Bundle args = new Bundle();
-        args.putParcelable("user", sautyUser);
+        args.putString("userID", userID);
 
-        FeedFragment fragment = new FeedFragment();
+        UserProfileFragment fragment = new UserProfileFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public interface PostClickedListener
-    {
-        void postClicked(Post post);
-    }
-
-    public interface  UserProfileClickedListener
-    {
-        void onUserProfileClicked(String userID);
     }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
+        this.context = context;
         try
         {
-            listener = (FabButtonClickedListener) context;
-            postClickedListener = (PostClickedListener) context;
-            userProfileClickedListener = (UserProfileClickedListener) context;
+            postClickedListener = (FeedFragment.PostClickedListener) context;
+            userProfileClickedListener = (FeedFragment.UserProfileClickedListener) context;
             this.context = context;
         }
         catch (ClassCastException e)
@@ -90,94 +77,127 @@ public class FeedFragment extends Fragment
             throw new ClassCastException(context.toString() +
                     " must implement OnFabClickedListener");
         }
-
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        sautyUser = getArguments().getParcelable("user");
-        firebaseAuth = FirebaseAuth.getInstance();
         databaseHelper = DatabaseHelper.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+
     }
+
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.show();
+        View v = inflater.inflate(R.layout.user_profile_view, container, false);
+        userProfileImageView = (ImageView) v.findViewById(R.id.userFullProfileImage);
+        userNameTextView = (TextView) v.findViewById(R.id.userNametvuserprofileName);
+        userFollowersCountTextView = (TextView) v.findViewById(R.id.followerstvuserprofile);
+        userFollowingCountTextView = (TextView) v.findViewById(R.id.followingTvUserprofile);
+        userFollowUnfollowingButton = (Button) v.findViewById(R.id.followUnfollowButton);
+        userStatusTextView = (TextView) v.findViewById(R.id.userStatusTvuserprofile);
+        userPostsRecyclerView = (RecyclerView) v.findViewById(R.id.user_profile_view_recyclerView);
 
-        View v = inflater.inflate(R.layout.fragment_feed, container, false);
-        recycler = (RecyclerView) v.findViewById(R.id.fragment_recycler);
-        recycler.setHasFixedSize(false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-//        layoutManager.setReverseLayout(true);
-        recycler.setLayoutManager(layoutManager);
-        fab = (FloatingActionButton) v.findViewById(R.id.add_new_post_fab);
+        userPostsRecyclerView.setLayoutManager(layoutManager);
 
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                listener.onAddPostFabButtonClicked();
-            }
-        });
-        fragmentConstraintLayout = (ConstraintLayout) v.findViewById(R.id.feedsFragmentConstriantLayout);
-
-        isTherePosts();
+        databaseHelper.getUser(getArguments().getString("userID"), this);
 
         return v;
     }
 
-    @Override
-    public void onDestroy()
-    {
-        recyclerAdapter.cleanup();
-        super.onDestroy();
-    }
 
-    private void isTherePosts()
+
+    private void initLayout()
     {
-        if (firebaseAuth.getCurrentUser() != null)
+        Glide.with(getContext())
+                .load(user.getUserProfilePic())
+                .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
+                .crossFade(5)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .into(userProfileImageView);
+
+
+        userNameTextView.setText(user.getUserName());
+        //Todo // FIXME: 15/4/17 get String from comment node
+        userFollowersCountTextView.setText(getResources()
+                .getQuantityString(R.plurals.numberOfFollowers,
+                        user.getUserFollowersCount(), user.getUserFollowersCount()));
+        userFollowingCountTextView.setText(getResources().getString(R.string.number_of_following
+        , user.getUserFollowingCount()));
+        userStatusTextView.setText(user.getUserStatus());
+
+        if (!user.getUserUid().equals(firebaseAuth.getCurrentUser().getUid()))
         {
-            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("/usersWalls/");
-            userFeedRef.child(firebaseAuth.getCurrentUser().getUid())
-                    .addListenerForSingleValueEvent(new ValueEventListener()
+            databaseHelper.isUserFollowed(user.getUserUid(), new DatabaseHelper.OnIsUserFollowedListener()
+            {
+                @Override
+                public void userFollowedByUser()
+                {
+                    userFollowUnfollowingButton.setText(getString(R.string.follow_text));
+                }
+
+                @Override
+                public void userNotFollowedByUser()
+                {
+                    userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
+
+                }
+            });
+
+            userFollowUnfollowingButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (userFollowUnfollowingButton.getText().toString().equals("FOLLOW"))
                     {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot)
+                        //Follow the user
+                        databaseHelper.followUser(user.getUserUid(), new DatabaseHelper.FollowUnfollowListener()
                         {
-                            if (dataSnapshot.getValue() != null)
+                            @Override
+                            public void onUserFollowedUnfollowed(String unfollowedFollowedText)
                             {
-                                //user Feed Available
-                                showFeed();
+                                // userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
                             }
-                            else
-                            {
-                                //user Feed doesn't exist. Show no Feed TextView
-                                showNoFeed();
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError)
+                        });
+                    }
+                    else if (userFollowUnfollowingButton.getText().toString().equals("UNFOLLOW"))
+                    {
+                        //Unfollow the user
+                        databaseHelper.unfollowUser(user.getUserUid(), new DatabaseHelper.FollowUnfollowListener()
                         {
-
-                        }
-                    });
+                            @Override
+                            public void onUserFollowedUnfollowed(String unfollowedFollowedText)
+                            {
+                                //userFollowUnfollowingButton.setText(getString(R.string.follow_text));
+                            }
+                        });
+                    }
+                }
+            });
         }
+        else
+        {
+            //User is checking own Profile. Don't show follow button;
+            userFollowUnfollowingButton.setVisibility(View.INVISIBLE);
+        }
+
+        initRecyclerView();
+
     }
 
-    private void showFeed()
+    private void initRecyclerView()
     {
         if (firebaseAuth.getCurrentUser() != null)
         {
             Query keyRef = databaseHelper.getRootDatabaseRef().child(
-                    "/usersWalls/" + firebaseAuth.getCurrentUser().getUid())
+                    "/userPosts/" + user.getUserUid())
                     .orderByChild("invertedDateCreated");
 
             recyclerAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(
@@ -209,39 +229,28 @@ public class FeedFragment extends Fragment
                         }
                     });
 
-                    DatabaseHelper.UserGottenListener userGottenListener = new DatabaseHelper.UserGottenListener()
+                    //We now populate the view
+                    postHolder.setPosterProfilePic(user.getUserProfilePic(), context);
+                    postHolder.setPosterProfileName(user.getUserName());
+                    postHolder.setPostDescriptionTextView(post.getPostDesc());
+                    //getting the image
+                    if(post.getImageUID() != null)
                     {
-                        //Called when User is gotten
-                        @Override
-                        public void onUserGotten(SautyUser user)
+                        databaseHelper.getImage(post.getImageUID(), new DatabaseHelper.ImageGottenListener()
                         {
-                            //After User is gotten we get the Imaged
-                            //image in post get image
-                            if (post.getImageUID() != null)
+                            //Called when image is gotten back
+                            @Override
+                            public void onImageGotten(SautyImage image)
                             {
-                                databaseHelper.getImage(post.getImageUID(),  new DatabaseHelper.ImageGottenListener()
-                                {
-                                    //Called when image is gotten back
-                                    @Override
-                                    public void onImageGotten(SautyImage image)
-                                    {
-                                        //Populate the imageView
-                                        postHolder.setPostImage(image.getImageUrl(), context);;
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                postHolder.postImageView.setVisibility(View.GONE);
-                            }
 
-                            postHolder.setPosterProfileName(sautyUser.getUserName());
-                            postHolder.setPosterProfilePic(sautyUser.getUserProfilePic(), context);
-                            postHolder.setPostDescriptionTextView(post.getPostDesc());
-                        }
-                    };
-                    //getting the user
-                    databaseHelper.getUser(post.getPosterId(), userGottenListener);
+                                postHolder.setPostImage(image.getImageUrl(), context);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        postHolder.postImageView.setVisibility(View.GONE);
+                    }
 
 
 
@@ -284,8 +293,8 @@ public class FeedFragment extends Fragment
 
                     //Todo // FIXME: 15/4/17 get String from comment node
                     postHolder.commentTextView.setText(getResources()
-                    .getQuantityString(R.plurals.numberOfCommentsAvailable,
-                            post.getPostCommentCount(), post.getPostCommentCount()));
+                            .getQuantityString(R.plurals.numberOfCommentsAvailable,
+                                    post.getPostCommentCount(), post.getPostCommentCount()));
 
                     postHolder.commentTextView.setOnClickListener(new View.OnClickListener()
                     {
@@ -316,61 +325,39 @@ public class FeedFragment extends Fragment
                         }
                     });
 
-                    postHolder.posterProfileName.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            userProfileClickedListener.onUserProfileClicked(post.getPosterId());
-                        }
-                    });
-
-                    postHolder.posterProfilePic.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            userProfileClickedListener.onUserProfileClicked(post.getPosterId());
-                        }
-                    });
-
-
-
-
+//                    postHolder.posterProfileName.setOnClickListener(new View.OnClickListener()
+//                    {
+//                        @Override
+//                        public void onClick(View v)
+//                        {
+//                            userProfileClickedListener.onUserProfileClicked(post.getPosterId());
+//                        }
+//                    });
+//
+//                    postHolder.posterProfilePic.setOnClickListener(new View.OnClickListener()
+//                    {
+//                        @Override
+//                        public void onClick(View v)
+//                        {
+//                            userProfileClickedListener.onUserProfileClicked(post.getPosterId());
+//                        }
+//                    });
 
                 }
             };
 
 
-            recycler.setAdapter(recyclerAdapter);
-
-            progressDialog.dismiss();
-
-            //databaseHelper.getPosts();
+            userPostsRecyclerView.setAdapter(recyclerAdapter);
         }
     }
 
 
-    private void showNoFeed()
+    @Override
+    public void onUserGotten(SautyUser user)
     {
-        recycler.setVisibility(View.GONE);
-
-        TextView noPostTextView =
-                (TextView) TextView.inflate(getContext(), R.layout.no_posts_on_wall_textview,
-                null);
-
-        fragmentConstraintLayout.addView(noPostTextView);
-        progressDialog.dismiss();
+        this.user = user;
+        initLayout();
     }
-
-    interface FabButtonClickedListener
-    {
-        void onAddPostFabButtonClicked();
-
-    }
-
-
-
 
 
 
@@ -439,6 +426,4 @@ public class FeedFragment extends Fragment
 
         }
     }
-
-
 }

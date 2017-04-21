@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/postViewLinearLayoutAll"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content"
+                                             android:isScrollContainer="true"
+                                             android:orientation="vertical"
+                                             tools:layout_editor_absoluteX="0dp"
+                                             tools:layout_editor_absoluteY="81dp">
+
+
+    <ImageView
+        android:id="@+id/fullPostposterProfilePic"
+        android:layout_width="53dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/user_profile_image"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"
+        tools:ignore="RtlHardcoded"/>
+
+    <TextView
+        android:id="@+id/postFeedposterProfileName"
+        android:layout_width="225dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/user_name_description"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@+id/fullPostposterProfilePic"
+        app:layout_constraintTop_toTopOf="@+id/fullPostposterProfilePic"
+        tools:ignore="RtlHardcoded"
+        tools:text="Mwakima Matano"/>
+
+
+    <ImageView
+        android:id="@+id/postfeedImageView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/image_post_describtion"
+        android:minHeight="256dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        tools:srcCompat="@drawable/ic_add_a_photo_black_24dp"/>
+
+
+    <ImageButton
+        android:id="@+id/feedlikeImageButton"
+        android:layout_width="45dp"
+        android:layout_height="47dp"
+        android:layout_marginLeft="33dp"
+        android:layout_marginStart="33dp"
+        android:background="@null"
+        android:contentDescription="@string/like_image"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/postfeedshareImageButton"
+        app:srcCompat="@drawable/ic_thumb_up_unclicked"
+        tools:ignore="RtlHardcoded"
+        />
+
+    <ImageButton
+        android:id="@+id/postfeedshareImageButton"
+        android:layout_width="48dp"
+        android:layout_height="53dp"
+        android:layout_marginLeft="38dp"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="8dp"
+        android:background="@null"
+        android:contentDescription="@string/share_description"
+        app:layout_constraintLeft_toRightOf="@+id/likesCounttextView"
+        app:layout_constraintTop_toBottomOf="@+id/post_feed_text_description"
+        app:srcCompat="@android:drawable/ic_menu_share"/>
+
+
+    <TextView
+        android:id="@+id/post_feed_text_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fadeScrollbars="true"
+        android:gravity="start"
+        android:isScrollContainer="false"
+        android:maxHeight="98dp"
+        android:minHeight="26dp"
+        android:scrollHorizontally="false"
+        android:scrollIndicators="right"
+        android:scrollbarFadeDuration="?android:attr/scrollbarFadeDuration"
+        android:scrollbarSize="?android:attr/scrollbarSize"
+        android:scrollbars="vertical"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postfeedImageView"
+        tools:targetApi="m"
+        tools:text="@string/lorae_ipsum_text"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="58dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="58dp"/>
+
+    <TextView
+        android:id="@+id/commentTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="26dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="26dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/comment_text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintLeft_toRightOf="@+id/shareCountTextView"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_feed_text_description"/>
+
+    <TextView
+        android:id="@+id/likesCounttextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="28dp"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintLeft_toRightOf="@+id/feedlikeImageButton"
+        app:layout_constraintTop_toBottomOf="@+id/post_feed_text_description"
+        tools:text="55555"/>
+
+    <TextView
+        android:id="@+id/shareCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="13dp"
+        android:layout_marginStart="13dp"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintLeft_toRightOf="@+id/postfeedshareImageButton"
+        app:layout_constraintTop_toTopOf="@+id/commentTextView"
+        tools:text="25"
+        />
+
+</android.support.constraint.ConstraintLayout>

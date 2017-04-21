@@ -21,18 +21,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.matano.sauty.Model.DatabaseHelper;
+import com.matano.sauty.Model.Post;
 import com.matano.sauty.Model.SautyUser;
 
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements
      DatabaseHelper.userFinishedSettingListener, FeedFragment.FabButtonClickedListener
-    ,AddPostFragment.onPostAddedListener
+    ,AddPostFragment.onPostAddedListener, ProfileFragment.EditButtonListener,
+        EditProfileFragment.ProfileUpdatedListener, FeedFragment.PostClickedListener,
+        FeedFragment.UserProfileClickedListener
 {
 
+    private static final String FULL_POST_FRAG = "Full Post Fragment";
     final int FIRE_UI_SIGN_IN = 55;
     final static String TAG = MainActivity.class.getSimpleName();
     final static String ADD_POST_FRAG = "Add Post Fragment";
+    final static String EDIT_PROF_FRAG = "Edit Profile Fragment";
     final static String FEEDS_FRAG = "Feed Fragment";
     SautyUser user;
     private FirebaseAuth firebaseAuth;
@@ -138,8 +143,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showSignInActivity()
     {
-        //Intent signInActivity = new Intent(this, SignInActivity.class);
-        //startActivityForResult(signInActivity, SIGN_IN);
         startActivityForResult(
                 AuthUI.getInstance()
                 .createSignInIntentBuilder()
@@ -206,6 +209,48 @@ public class MainActivity extends AppCompatActivity implements
         transaction.commit();
     }
 
+    @Override
+    public void onUserProfileClicked(String userID)
+    {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.activity_frameLayout, UserProfileFragment.newInstance(userID));
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void postClicked(Post post)
+    {
+        showFullPostFragment(post.getPostId());
+    }
+
+    //ProfileFragment Listener
+
+    @Override
+    public void onEditButtonClicked()
+    {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        transaction.replace(R.id.activity_frameLayout, EditProfileFragment.newInstance(user), EDIT_PROF_FRAG);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    //EditProfile Listener
+
+    @Override
+    public void userSuccessfullyUpdated()
+    {
+        getSupportFragmentManager().popBackStack();
+    }
+
+    @Override
+    public void userFailedUpdate()
+    {
+
+    }
+
+
     //AddPostFragment Listener
 
     @Override
@@ -213,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements
     {
         getSupportFragmentManager().popBackStack();
     }
+
+
 
 
     //DatabaseHelper Listener
@@ -230,4 +277,44 @@ public class MainActivity extends AppCompatActivity implements
     {
         Toast.makeText(this, "ERROR!...Setting User failed....", Toast.LENGTH_SHORT).show();
     }
+
+
+
+
+    private void showFullPostFragment(String postId)
+    {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.activity_frameLayout, FullPostFragment.newInstance(postId), FULL_POST_FRAG);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,11 +1,8 @@
 package com.matano.sauty;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,11 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.matano.sauty.Model.DatabaseHelper;
@@ -35,99 +28,63 @@ import com.matano.sauty.Model.SautyImage;
 import com.matano.sauty.Model.SautyUser;
 
 /**
- * Created by matano on 17/3/17.
+ * Created by matano on 12/4/17.
  */
 
-public class FeedFragment extends Fragment
+//Todo change the FirebaserecyclerAdapter to deal with it
+public class TrendingFragment extends Fragment
 {
-    SautyUser sautyUser;
-    RecyclerView recycler;
-    FloatingActionButton fab;
-    ConstraintLayout fragmentConstraintLayout;
+    RecyclerView trendingPostRecyclerView;
+    FirebaseRecyclerAdapter<Post, PostHolder> recyclerAdapter;
+    Context context;
     FirebaseAuth firebaseAuth;
     DatabaseHelper databaseHelper;
-    FirebaseRecyclerAdapter<Post, PostHolder> recyclerAdapter;
-    FabButtonClickedListener listener;
-    PostClickedListener postClickedListener;
-    UserProfileClickedListener userProfileClickedListener;
-    Context context;
-    ProgressDialog progressDialog;
+    FeedFragment.PostClickedListener postClickedListener;
+    FeedFragment.UserProfileClickedListener userProfileClickedListener;
 
-    public static FeedFragment newInstance(SautyUser sautyUser)
+    public static TrendingFragment newInstance()
     {
 
         Bundle args = new Bundle();
-        args.putParcelable("user", sautyUser);
 
-        FeedFragment fragment = new FeedFragment();
+        TrendingFragment fragment = new TrendingFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public interface PostClickedListener
-    {
-        void postClicked(Post post);
-    }
-
-    public interface  UserProfileClickedListener
-    {
-        void onUserProfileClicked(String userID);
     }
 
     @Override
     public void onAttach(Context context)
     {
         super.onAttach(context);
+        this.context = context;
+
         try
         {
-            listener = (FabButtonClickedListener) context;
-            postClickedListener = (PostClickedListener) context;
-            userProfileClickedListener = (UserProfileClickedListener) context;
-            this.context = context;
+            postClickedListener = (FeedFragment.PostClickedListener) context;
+            userProfileClickedListener = (FeedFragment.UserProfileClickedListener) context;
         }
         catch (ClassCastException e)
         {
             throw new ClassCastException(context.toString() +
-                    " must implement OnFabClickedListener");
+                    " must implement OnPostClickedListener");
         }
 
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        sautyUser = getArguments().getParcelable("user");
-        firebaseAuth = FirebaseAuth.getInstance();
         databaseHelper = DatabaseHelper.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.show();
+        View v = inflater.inflate(R.layout.fragment_trending, container, false);
 
-        View v = inflater.inflate(R.layout.fragment_feed, container, false);
-        recycler = (RecyclerView) v.findViewById(R.id.fragment_recycler);
-        recycler.setHasFixedSize(false);
+        trendingPostRecyclerView = (RecyclerView) v.findViewById(R.id.trendingPostRecyclerView);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-//        layoutManager.setReverseLayout(true);
-        recycler.setLayoutManager(layoutManager);
-        fab = (FloatingActionButton) v.findViewById(R.id.add_new_post_fab);
+        trendingPostRecyclerView.setLayoutManager(layoutManager);
 
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                listener.onAddPostFabButtonClicked();
-            }
-        });
-        fragmentConstraintLayout = (ConstraintLayout) v.findViewById(R.id.feedsFragmentConstriantLayout);
-
-        isTherePosts();
+        showTrendingFeed();
 
         return v;
     }
@@ -139,56 +96,23 @@ public class FeedFragment extends Fragment
         super.onDestroy();
     }
 
-    private void isTherePosts()
-    {
-        if (firebaseAuth.getCurrentUser() != null)
-        {
-            DatabaseReference userFeedRef = databaseHelper.getRootDatabaseRef().child("/usersWalls/");
-            userFeedRef.child(firebaseAuth.getCurrentUser().getUid())
-                    .addListenerForSingleValueEvent(new ValueEventListener()
-                    {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot)
-                        {
-                            if (dataSnapshot.getValue() != null)
-                            {
-                                //user Feed Available
-                                showFeed();
-                            }
-                            else
-                            {
-                                //user Feed doesn't exist. Show no Feed TextView
-                                showNoFeed();
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError)
-                        {
-
-                        }
-                    });
-        }
-    }
-
-    private void showFeed()
+    private void showTrendingFeed()
     {
         if (firebaseAuth.getCurrentUser() != null)
         {
             Query keyRef = databaseHelper.getRootDatabaseRef().child(
-                    "/usersWalls/" + firebaseAuth.getCurrentUser().getUid())
-                    .orderByChild("invertedDateCreated");
+                    "/posts/")
+                    .orderByChild("invertedLikes");
 
-            recyclerAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(
-                    Post.class, R.layout.post_feed_view, PostHolder.class,
+            recyclerAdapter = new FirebaseRecyclerAdapter<Post, TrendingFragment.PostHolder>(
+                    Post.class, R.layout.post_feed_view, TrendingFragment.PostHolder.class,
                     keyRef)
             {
 
                 //Don't even Ask what the fuck is happening below.
 
                 @Override
-                protected void populateViewHolder(final PostHolder postHolder, final Post post, final int position)
+                protected void populateViewHolder(final TrendingFragment.PostHolder postHolder, final Post post, int position)
                 {
                     //Adding a listener to know when a User has been gotten in the database.
 
@@ -235,8 +159,8 @@ public class FeedFragment extends Fragment
                                 postHolder.postImageView.setVisibility(View.GONE);
                             }
 
-                            postHolder.setPosterProfileName(sautyUser.getUserName());
-                            postHolder.setPosterProfilePic(sautyUser.getUserProfilePic(), context);
+                            postHolder.setPosterProfileName(user.getUserName());
+                            postHolder.setPosterProfilePic(user.getUserProfilePic(), context);
                             postHolder.setPostDescriptionTextView(post.getPostDesc());
                         }
                     };
@@ -284,8 +208,8 @@ public class FeedFragment extends Fragment
 
                     //Todo // FIXME: 15/4/17 get String from comment node
                     postHolder.commentTextView.setText(getResources()
-                    .getQuantityString(R.plurals.numberOfCommentsAvailable,
-                            post.getPostCommentCount(), post.getPostCommentCount()));
+                            .getQuantityString(R.plurals.numberOfCommentsAvailable,
+                                    post.getPostCommentCount(), post.getPostCommentCount()));
 
                     postHolder.commentTextView.setOnClickListener(new View.OnClickListener()
                     {
@@ -333,46 +257,13 @@ public class FeedFragment extends Fragment
                             userProfileClickedListener.onUserProfileClicked(post.getPosterId());
                         }
                     });
-
-
-
-
-
                 }
             };
 
+            trendingPostRecyclerView.setAdapter(recyclerAdapter);
 
-            recycler.setAdapter(recyclerAdapter);
-
-            progressDialog.dismiss();
-
-            //databaseHelper.getPosts();
         }
     }
-
-
-    private void showNoFeed()
-    {
-        recycler.setVisibility(View.GONE);
-
-        TextView noPostTextView =
-                (TextView) TextView.inflate(getContext(), R.layout.no_posts_on_wall_textview,
-                null);
-
-        fragmentConstraintLayout.addView(noPostTextView);
-        progressDialog.dismiss();
-    }
-
-    interface FabButtonClickedListener
-    {
-        void onAddPostFabButtonClicked();
-
-    }
-
-
-
-
-
 
     private static class PostHolder extends RecyclerView.ViewHolder
     {
@@ -385,6 +276,7 @@ public class FeedFragment extends Fragment
         TextView commentTextView;
         TextView likesCountTextView;
 
+
         public PostHolder(View itemView)
         {
             super(itemView);
@@ -392,7 +284,6 @@ public class FeedFragment extends Fragment
             posterProfilePic = (ImageView) itemView.findViewById(R.id.fullPostposterProfilePic);
             postImageView = (ImageView) itemView.findViewById(R.id.postfeedImageView);
             likeImageButton = (ImageButton) itemView.findViewById(R.id.feedlikeImageButton);
-            likeImageButton.setActivated(false);
             shareImageButton = (ImageButton) itemView.findViewById(R.id.postfeedshareImageButton);
             postDescriptionTextView = (TextView) itemView.findViewById(R.id.post_feed_text_description);
             commentTextView = (TextView) itemView.findViewById(R.id.commentTextView);
@@ -439,6 +330,4 @@ public class FeedFragment extends Fragment
 
         }
     }
-
-
 }

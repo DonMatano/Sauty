@@ -15,11 +15,14 @@ public class Post
     private String postId;
     private int postLikes = 0;
     private int postShares = 0;
+    private int invertedLikes = 0;
+    private int postCommentCount = 0;
     private String posterId;
     private String postDesc;
     private String imageUID;
     private String audioUID;
     private Long dateCreated;
+    private Long invertedDateCreated;
 
     public Post()
     {
@@ -48,6 +51,20 @@ public class Post
         return ServerValue.TIMESTAMP;
     }
 
+    public Long getInvertedDateCreated()
+    {
+        return invertedDateCreated;
+    }
+
+    public int getPostCommentCount()
+    {
+        return postCommentCount;
+    }
+
+    public void setPostCommentCount(int postCommentCount)
+    {
+        this.postCommentCount = postCommentCount;
+    }
 
     public String getPostId()
     {
@@ -67,6 +84,16 @@ public class Post
     public void setPostLikes(int postLikes)
     {
         this.postLikes = postLikes;
+    }
+
+    public int getInvertedLikes()
+    {
+        return invertedLikes;
+    }
+
+    public void setInvertedLikes(int invertedLikes)
+    {
+        this.invertedLikes = invertedLikes;
     }
 
     public int getPostShares()
@@ -128,6 +155,11 @@ public class Post
     public void setDateCreated(Long dateCreated)
     {
         this.dateCreated = dateCreated;
+    }
+
+    void setInvertedDateCreated(Long invertedDateCreated)
+    {
+        this.invertedDateCreated = invertedDateCreated;
     }
 
     @Override
