@@ -215,34 +215,34 @@ public class FeedFragment extends Fragment
                         @Override
                         public void onUserGotten(SautyUser user)
                         {
-                            //After User is gotten we get the Imaged
-                            //image in post get image
-                            if (post.getImageUID() != null)
-                            {
-                                databaseHelper.getImage(post.getImageUID(),  new DatabaseHelper.ImageGottenListener()
-                                {
-                                    //Called when image is gotten back
-                                    @Override
-                                    public void onImageGotten(SautyImage image)
-                                    {
-                                        //Populate the imageView
-                                        postHolder.setPostImage(image.getImageUrl(), context);;
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                postHolder.postImageView.setVisibility(View.GONE);
-                            }
-
-                            postHolder.setPosterProfileName(sautyUser.getUserName());
-                            postHolder.setPosterProfilePic(sautyUser.getUserProfilePic(), context);
+                            //After User is gotten we fill up the postView
+                            postHolder.setPosterProfileName(user.getUserName());
+                            postHolder.setPosterProfilePic(user.getUserProfilePic(), context);
                             postHolder.setPostDescriptionTextView(post.getPostDesc());
                         }
                     };
+
                     //getting the user
                     databaseHelper.getUser(post.getPosterId(), userGottenListener);
 
+                    //image in post get image
+                    if (post.getImageUID() != null)
+                    {
+                        databaseHelper.getImage(post.getImageUID(),  new DatabaseHelper.ImageGottenListener()
+                        {
+                            //Called when image is gotten back
+                            @Override
+                            public void onImageGotten(SautyImage image)
+                            {
+                                //Populate the imageView
+                                postHolder.setPostImage(image.getImageUrl(), context);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        postHolder.postImageView.setVisibility(View.GONE);
+                    }
 
 
                     postHolder.likeImageButton.setOnClickListener(new View.OnClickListener()
@@ -368,11 +368,6 @@ public class FeedFragment extends Fragment
         void onAddPostFabButtonClicked();
 
     }
-
-
-
-
-
 
     private static class PostHolder extends RecyclerView.ViewHolder
     {

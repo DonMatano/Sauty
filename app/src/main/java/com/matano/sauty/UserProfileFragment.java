@@ -111,6 +111,13 @@ public class UserProfileFragment extends Fragment
         return v;
     }
 
+    @Override
+    public void onDestroy()
+    {
+        recyclerAdapter.cleanup();
+        super.onDestroy();
+    }
+
 
 
     private void initLayout()
@@ -139,13 +146,13 @@ public class UserProfileFragment extends Fragment
                 @Override
                 public void userFollowedByUser()
                 {
-                    userFollowUnfollowingButton.setText(getString(R.string.follow_text));
+                    userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
                 }
 
                 @Override
                 public void userNotFollowedByUser()
                 {
-                    userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
+                    userFollowUnfollowingButton.setText(getString(R.string.follow_text));
 
                 }
             });
@@ -163,7 +170,7 @@ public class UserProfileFragment extends Fragment
                             @Override
                             public void onUserFollowedUnfollowed(String unfollowedFollowedText)
                             {
-                                // userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
+                                userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
                             }
                         });
                     }
@@ -175,7 +182,7 @@ public class UserProfileFragment extends Fragment
                             @Override
                             public void onUserFollowedUnfollowed(String unfollowedFollowedText)
                             {
-                                //userFollowUnfollowingButton.setText(getString(R.string.follow_text));
+                                userFollowUnfollowingButton.setText(getString(R.string.follow_text));
                             }
                         });
                     }

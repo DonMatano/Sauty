@@ -270,9 +270,9 @@ public class DatabaseHelper
                     sautyUser = new SautyUser(name, photoUrl, email, firebaseUser.getUid());
 
                     Map<String , Object> userMap = new HashMap<>();
-                    userMap.put(firebaseUser.getUid(), sautyUser);
+                    userMap.put("users/" + firebaseUser.getUid(), sautyUser);
 
-                    rootDatabaseRef.child("users").setValue(userMap)
+                    rootDatabaseRef.updateChildren(userMap)
                             .addOnCompleteListener(new OnCompleteListener<Void>()
                             {
                                 @Override
@@ -590,7 +590,7 @@ public class DatabaseHelper
 
                 //Start second Transaction
                 DatabaseReference postLikesRef = rootDatabaseRef.child("/usersWalls/" +
-                        firebaseAuth.getCurrentUser().getUid() + "/" + post.getPostId());
+                        post.getPosterId() + "/" + post.getPostId());
 
                 postLikesRef.runTransaction(new Transaction.Handler()
                 {
@@ -628,7 +628,7 @@ public class DatabaseHelper
 
                         //Start third Transaction
                         DatabaseReference postLikesRef = rootDatabaseRef.child("/userPosts/" +
-                                firebaseAuth.getCurrentUser().getUid() + "/" + post.getPostId());
+                                post.getPosterId() + "/" + post.getPostId());
 
                         postLikesRef.runTransaction(new Transaction.Handler()
                         {
@@ -940,9 +940,9 @@ public class DatabaseHelper
 
     private void updateFollowingCount(String userId, final String toAddSubtract)
     {
-        DatabaseReference followerCountRef = rootDatabaseRef.child("/users/" + userId);
+        DatabaseReference followingCountRef = rootDatabaseRef.child("/users/" + userId);
 
-        followerCountRef.runTransaction(new Transaction.Handler()
+        followingCountRef.runTransaction(new Transaction.Handler()
         {
             @Override
             public Transaction.Result doTransaction(MutableData mutableData)
@@ -961,12 +961,10 @@ public class DatabaseHelper
 
                 else if (toAddSubtract.equals("subtract"))
                 {
-                    user.setUserFollowersCount(user.getUserFollowingCount() - 1);
+                    user.setUserFollowingCount(user.getUserFollowingCount() - 1);
 
-                    user.setInvertedFollowersCount(user.getInvertedFollowingCount() + 1);
+                    user.setInvertedFollowingCount(user.getInvertedFollowingCount() + 1);
                 }
-
-
                 mutableData.setValue(user);
                 return Transaction.success(mutableData);
 
@@ -1145,7 +1143,7 @@ public class DatabaseHelper
             DatabaseReference followerPath = rootDatabaseRef.child("/userFollowing/" + firebaseAuth
                     .getCurrentUser().getUid() + "/" + userID);
 
-            followerPath.addValueEventListener(new ValueEventListener()
+            followerPath.addListenerForSingleValueEvent(new ValueEventListener()
             {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot)
@@ -1175,8 +1173,8 @@ public class DatabaseHelper
         {
             HashMap<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/usersFollowers/" + followId + "/" + firebaseAuth.getCurrentUser().getUid()
-            , true);
-            childUpdates.put("/userFollowing/" + firebaseAuth.getCurrentUser().getUid()+ "/" + followId, true);
+            , firebaseAuth.getCurrentUser().getUid());
+            childUpdates.put("/userFollowing/" + firebaseAuth.getCurrentUser().getUid()+ "/" + followId, followId);
             rootDatabaseRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>()
             {
                 @Override
@@ -1184,7 +1182,7 @@ public class DatabaseHelper
                 {
                     if (task.isSuccessful())
                     {
-                        //followUnfollowListener.onUserFollowedUnfollowed("UNFOLLOW");
+                        followUnfollowListener.onUserFollowedUnfollowed("UNFOLLOW");
                         updateFollowerCount(followId, "add");
                         updateFollowingCount(firebaseAuth.getCurrentUser().getUid(), "add");
                         updateWallWithNewFollowPost(followId);
@@ -1203,7 +1201,7 @@ public class DatabaseHelper
 
     private void updateFollowerWall(final Post post)
     {
-        DatabaseReference followersRef = rootDatabaseRef.child("/usersFollowers/" + firebaseAuth.getCurrentUser().getUid());
+        DatabaseReference followersRef = rootDatabaseRef.child("/usersFollowers/" + post.getPosterId());
         followersRef.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -1222,7 +1220,7 @@ public class DatabaseHelper
 
                     for (String followerId: followerIdArrayList)
                     {
-                        followersIDMap.put("/usersWalls/" + followerId + post.getPostId(), post);
+                        followersIDMap.put("/usersWalls/" + followerId + "/" + post.getPostId(), post);
                     }
 
                     rootDatabaseRef.updateChildren(followersIDMap).addOnCompleteListener(new OnCompleteListener<Void>()
@@ -1267,11 +1265,10 @@ public class DatabaseHelper
                 {
                     if (task.isSuccessful())
                     {
-                        //followUnfollowListener.onUserFollowedUnfollowed("FOLLOW");
+                        followUnfollowListener.onUserFollowedUnfollowed("FOLLOW");
                         updateFollowerCount(unfollowId, "subtract");
                         updateFollowingCount(firebaseAuth.getCurrentUser().getUid(), "subtract");
                         removePostToWall(unfollowId);
-
                     }
                     else
                     {
@@ -1338,8 +1335,8 @@ public class DatabaseHelper
 
                             for (Post post : postArrayList)
                             {
-                                hashMap.put("/userWalls/" + firebaseAuth.getCurrentUser().getUid()
-                                + post.getPostId(), null);
+                                hashMap.put("/usersWalls/" + firebaseAuth.getCurrentUser().getUid()
+                                + "/" + post.getPostId(), null);
                             }
 
                             rootDatabaseRef.updateChildren(hashMap).addOnCompleteListener(

@@ -122,6 +122,13 @@ public class FullPostFragment extends Fragment
 
     }
 
+    @Override
+    public void onDestroy()
+    {
+        commentAdapter.cleanup();
+        super.onDestroy();
+    }
+
     //DatabaseHelper PostGotten Listener
     @Override
     public void onPostGotten(Post post)

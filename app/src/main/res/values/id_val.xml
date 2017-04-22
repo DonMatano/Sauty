@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ... -->
+    <string name="facebook_application_id" translatable="false">1249819008477011</string>
+    <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb1249819008477011</string>
+
+    <string name="twitter_consumer_key" translatable="false">MhKamkc2AxTxLPYg7cYNbwfj1</string>
+    <string name="twitter_consumer_secret" translatable="false">WgtlYI8oe8avcNbfYedxoS71AjJzisahr0l97Z2zXYBPP3V77w</string>
+
+</resources>

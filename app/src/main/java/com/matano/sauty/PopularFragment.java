@@ -78,6 +78,13 @@ public class PopularFragment extends Fragment
         return v;
     }
 
+    @Override
+    public void onDestroy()
+    {
+        recyclerAdapter.cleanup();
+        super.onDestroy();
+    }
+
     private void showPopularUsers()
     {
         if (firebaseAuth != null)
@@ -128,13 +135,13 @@ public class PopularFragment extends Fragment
                             @Override
                             public void userFollowedByUser()
                             {
-                                viewHolder.followUnfollowButton.setText(getString(R.string.follow_text));
+                                viewHolder.followUnfollowButton.setText(getString(R.string.unfollow_text));
                             }
 
                             @Override
                             public void userNotFollowedByUser()
                             {
-                                viewHolder.followUnfollowButton.setText(getString(R.string.unfollow_text));
+                                viewHolder.followUnfollowButton.setText(getString(R.string.follow_text));
 
                             }
                         });
@@ -152,7 +159,7 @@ public class PopularFragment extends Fragment
                                         @Override
                                         public void onUserFollowedUnfollowed(String unfollowedFollowedText)
                                         {
-                                            // userFollowUnfollowingButton.setText(getString(R.string.unfollow_text));
+                                             viewHolder.followUnfollowButton.setText(getString(R.string.unfollow_text));
                                         }
                                     });
                                 }
@@ -164,7 +171,7 @@ public class PopularFragment extends Fragment
                                         @Override
                                         public void onUserFollowedUnfollowed(String unfollowedFollowedText)
                                         {
-                                            //userFollowUnfollowingButton.setText(getString(R.string.follow_text));
+                                            viewHolder.followUnfollowButton.setText(getString(R.string.follow_text));
                                         }
                                     });
                                 }

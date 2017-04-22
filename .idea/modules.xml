@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Sauty.iml" filepath="$PROJECT_DIR$/Sauty.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mpcutter/mpcutter.iml" filepath="$PROJECT_DIR$/mpcutter/mpcutter.iml" />
     </modules>
   </component>
 </project>
