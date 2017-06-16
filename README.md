@@ -3,4 +3,4 @@ Social App
 
 updated link.
 
-<b> DownLoad link : </b> [Download apk here..](http://www.mediafire.com/file/88n4jlx5yjcndca/SautyAlpha.apk)
+<b> DownLoad link : </b> [Download apk here..](http://www.mediafire.com/file/tay8644afr3a2b7/SautyAlpha.apk)
