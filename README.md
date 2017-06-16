@@ -1,5 +1,6 @@
 # Sauty
 Social App
 
+updated link.
 
-<b> DownLoad link : </b> [Download apk here..](http://www.mediafire.com/file/b7zdnl1ol4y7zjc/SautyAlpha.apk "Download Apk")
+<b> DownLoad link : </b> [Download apk here..](http://www.mediafire.com/file/tay8644afr3a2b7/SautyAlpha.apk)
