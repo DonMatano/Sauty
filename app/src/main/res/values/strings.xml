@@ -47,6 +47,7 @@ Integer suscipit gravida leo eu ultricies. Nunc efficitur consectetur maximus. N
     <string name="user_name_text">User Name</string>
     <string name="status_textview_text">Status</string>
     <string name="edit_profile_image_desc">Edit your profile Image</string>
+    <string name="no_empty_post">Sorry can\'t post an empty post</string>
     <string name="comment_text">Comments</string>
     <string name="add_comment_text">Add Comment</string>
     <string name="view_comments">View Comments</string>

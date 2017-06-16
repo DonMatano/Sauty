@@ -190,7 +190,7 @@ public class PopularFragment extends Fragment
         }
     }
 
-    private static class UserHolder extends RecyclerView.ViewHolder
+    public static class UserHolder extends RecyclerView.ViewHolder
     {
         ImageView profilePicImageView;
         TextView userNameTextView;

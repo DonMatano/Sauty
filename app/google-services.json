@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "124775510452-08ns2vgbu7c24tlu3rnf5l2jp0i77ep3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.matano.sauty",
+            "certificate_hash": "b69716095761559c669ca492d74f78970ded211d"
+          }
+        },
+        {
           "client_id": "124775510452-vqrs7ojng3pg0ebhu123f6ecn1gmuojm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

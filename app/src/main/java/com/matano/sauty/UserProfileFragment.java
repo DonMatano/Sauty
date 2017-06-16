@@ -368,7 +368,7 @@ public class UserProfileFragment extends Fragment
 
 
 
-    private static class PostHolder extends RecyclerView.ViewHolder
+    public static class PostHolder extends RecyclerView.ViewHolder
     {
         TextView posterProfileName;
         ImageView posterProfilePic;
@@ -391,6 +391,9 @@ public class UserProfileFragment extends Fragment
             postDescriptionTextView = (TextView) itemView.findViewById(R.id.post_feed_text_description);
             commentTextView = (TextView) itemView.findViewById(R.id.commentTextView);
             likesCountTextView = (TextView) itemView.findViewById(R.id.likesCounttextView);
+
+            //TODO // FIXME: 16/6/17 shareImageButton
+            shareImageButton.setVisibility(View.GONE);
         }
 
 
@@ -403,10 +406,8 @@ public class UserProfileFragment extends Fragment
         {
             postImageView.getWidth();
 
-            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(downloadImage);
             Glide.with(context)
-                    .using(new FirebaseImageLoader())
-                    .load(ref)
+                    .load(downloadImage)
                     .placeholder(R.drawable.image_placeholder)
                     .crossFade(5)
                     .fitCenter()
@@ -422,7 +423,6 @@ public class UserProfileFragment extends Fragment
 
         void setPosterProfilePic(String profilePic, Context context)
         {
-            //StorageReference reference = FirebaseStorage.getInstance().getReferenceFromUrl(profilePic);
             Glide.with(context)
                     .load(profilePic)
                     .placeholder(R.drawable.com_facebook_profile_picture_blank_square)

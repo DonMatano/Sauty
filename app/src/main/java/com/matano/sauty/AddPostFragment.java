@@ -94,7 +94,7 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
             @Override
             public void onClick(View v)
             {
-                addPost();
+                    addPost();
             }
         });
 
@@ -128,10 +128,19 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
         }
         else
         {
-            //Post has no image
-            progressDialog.setTitle(getString(R.string.uploading__post));
-            progressDialog.show();
-            databaseHelper.addNewPost(null, descEditText.getText().toString().trim(), this);
+            if (!descEditText.getText().toString().trim().isEmpty())
+            {
+                //Post has no image
+                progressDialog.setTitle(getString(R.string.uploading__post));
+                progressDialog.show();
+                databaseHelper.addNewPost(null, descEditText.getText().toString().trim(), this);
+            }
+            else
+            {
+                progressDialog.dismiss();
+                Toast.makeText(getContext(), getString(R.string.no_empty_post), Toast.LENGTH_SHORT).show();
+            }
+
 
         }
 
@@ -182,11 +191,13 @@ public class AddPostFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onImageAddedFailed()
     {
+        progressDialog.dismiss();
     }
 
     @Override
     public void onPhotoUploadFailed()
     {
+        progressDialog.dismiss();
         Toast.makeText(getContext(), getText(R.string.failed_uploading_photo), Toast.LENGTH_SHORT).show();
     }
 

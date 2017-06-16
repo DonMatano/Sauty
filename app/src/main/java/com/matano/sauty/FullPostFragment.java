@@ -118,6 +118,9 @@ public class FullPostFragment extends Fragment
 
         databaseHelper.getPost(getArguments().getString("postId"), this);
 
+        //Todo Fix Share button
+        shareImageButton.setVisibility(View.GONE);
+
         return v;
 
     }
@@ -144,7 +147,7 @@ public class FullPostFragment extends Fragment
             @Override
             public void onUserGotten(SautyUser user)
             {
-                Glide.with(getActivity())
+                Glide.with(getContext())
                         .load(user.getUserProfilePic())
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_square)
                         .thumbnail(0.5f)
@@ -163,10 +166,8 @@ public class FullPostFragment extends Fragment
                 @Override
                 public void onImageGotten(SautyImage image)
                 {
-                    StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(image.getImageUrl());
                     Glide.with(getContext())
-                            .using(new FirebaseImageLoader())
-                            .load(ref)
+                            .load(image.getImageUrl())
                             .placeholder(R.drawable.image_placeholder)
                             .crossFade(5)
                             .diskCacheStrategy(DiskCacheStrategy.RESULT)
@@ -408,7 +409,7 @@ public class FullPostFragment extends Fragment
         }
     }
 
-    private static class CommentHolder extends RecyclerView.ViewHolder
+    public static class CommentHolder extends RecyclerView.ViewHolder
     {
         TextView commentorName;
         TextView commentTextDesc;

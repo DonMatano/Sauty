@@ -147,10 +147,8 @@ public class MainActivity extends AppCompatActivity implements
                 AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setIsSmartLockEnabled(!BuildConfig.DEBUG)
-                .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                        new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                        new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build(),
-                        new AuthUI.IdpConfig.Builder(AuthUI.TWITTER_PROVIDER).build()))
+                .setProviders(Arrays.asList(
+                        new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                 .build(), FIRE_UI_SIGN_IN
         );
     }

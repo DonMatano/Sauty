@@ -369,7 +369,7 @@ public class FeedFragment extends Fragment
 
     }
 
-    private static class PostHolder extends RecyclerView.ViewHolder
+    public static class PostHolder extends RecyclerView.ViewHolder
     {
         TextView posterProfileName;
         ImageView posterProfilePic;
@@ -389,6 +389,9 @@ public class FeedFragment extends Fragment
             likeImageButton = (ImageButton) itemView.findViewById(R.id.feedlikeImageButton);
             likeImageButton.setActivated(false);
             shareImageButton = (ImageButton) itemView.findViewById(R.id.postfeedshareImageButton);
+
+            //Todo Fix ShareImageButton
+            shareImageButton.setVisibility(View.GONE);
             postDescriptionTextView = (TextView) itemView.findViewById(R.id.post_feed_text_description);
             commentTextView = (TextView) itemView.findViewById(R.id.commentTextView);
             likesCountTextView = (TextView) itemView.findViewById(R.id.likesCounttextView);
@@ -404,10 +407,8 @@ public class FeedFragment extends Fragment
         {
             postImageView.getWidth();
 
-            StorageReference ref = FirebaseStorage.getInstance().getReferenceFromUrl(downloadImage);
             Glide.with(context)
-                    .using(new FirebaseImageLoader())
-                    .load(ref)
+                    .load(downloadImage)
                     .placeholder(R.drawable.image_placeholder)
                     .crossFade(5)
                     .fitCenter()
